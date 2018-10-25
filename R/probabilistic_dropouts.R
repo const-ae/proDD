@@ -181,4 +181,59 @@ mean_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
 
 
 
+#' Find the variance of  of the probabilistic dropout distribution function
+#'
+#' @param approx boolean. If TRUE match the probabilistic dropout
+#'   distribution to a skewed normal distribution and use its mean as an
+#'   approximation. If FALSE calculate the first moment using numerical
+#'   integration
+#'
+#' @section Warning:
+#' This function is not vectorized
+variance_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
+
+    nmis <- length(rho)
+    if(nmis == 0){
+        # Easy way out
+        return(sigma2)
+    }
+
+    if(approx){
+        # Laplace Approximation
+        mode <- mode_probdropout(mu, sigma2, rho, zeta)
+        variance <- -1 / (-1/sigma2 +
+                              sign(zeta) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
+                                                     invprobit(mode, rho, zeta))^2)) -
+                              sign(zeta) * (sum((mode-rho)/abs(zeta)^2 *
+                                                    dnorm(mode, mean=rho, sd=abs(zeta)) /
+                                                    invprobit(mode, rho, zeta))) )
+        # Match a skewed normal distribution to the probabilistic dropout
+        # with 5 points around the mode
+        points <-  c(0,1,-1,0.5,-0.5)
+        f <- dprobdropout(mode + points * sqrt(variance), mu, sigma2, rho=rho, zeta=zeta)
+        res <- optim(par=c(location=mode, omega=1, alpha=1), function(par){
+            location <- par[1]
+            omega <- par[2]
+            alpha <- par[3]
+            if(omega < 0) return(Inf)
+            approx_f <- sn::dsn(mode+ points * sqrt(variance), xi=location,
+                                omega=omega, alpha=alpha, tau=0)
+            sum((f - approx_f)^2)
+        })
+        # Use the analytical formula to calculate the variance of the skewed normal
+        # which approximates the variance of the probabilistic dropout distribution
+        ret <- res$par[2]^2 * (1 - 2 * (res$par[3] / sqrt(1 + res$par[3]^2))^2 / pi)
+        names(ret) <- NULL
+        ret
+    }else{
+        mom2 <- integrate(function(x){
+            x^2 * dprobdropout(x, mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)
+        }, lower=-Inf, upper=Inf)$value
+
+        mom2 - mean_probdropout(mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)^2
+    }
+
+}
+
+
 

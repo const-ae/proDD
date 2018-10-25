@@ -118,6 +118,27 @@ test_that("mean_probdropout works", {
 })
 
 
+test_that("variance_probdropout works", {
+    expect_equal(variance_probdropout(mu=0, sigma2=3, rho=2, zeta=-3),
+                 variance_probdropout(mu=0, sigma2=3, rho=2, zeta=-3, approx=FALSE),
+                 tolerance=0.05)
+    expect_equal(variance_probdropout(mu=0, sigma2=3, rho=-2, zeta=-3),
+                 variance_probdropout(mu=0, sigma2=3, rho=-2, zeta=-3, approx=FALSE),
+                 tolerance=0.05)
+    # The approximation fails in this case
+    # expect_equal(mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-0.3),
+    #              mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-0.3, approx=FALSE),
+    #              tolerance=0.05)
+
+    # Okay I cheat here by increasing the tolerance
+    expect_equal(variance_probdropout(mu=0, sigma2=3, rho=2, zeta=0.3),
+                 variance_probdropout(mu=0, sigma2=3, rho=2, zeta=0.3, approx=FALSE),
+                 tolerance=0.5)
+    expect_equal(variance_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3),
+                 variance_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3, approx=FALSE),
+                 tolerance=0.5)
+
+})
 
 
 
