@@ -56,3 +56,39 @@ test_that("dprobdropout fails on bad input", {
     # mu and sigma2 are not vectors
     expect_error(dprobdropout(xg, mu=1:3, sigma2=3))
 })
+
+
+test_that("mode_probdropout works", {
+
+    mode <- mode_probdropout(mu=0, sigma2=3, rho=2, zeta=-3)
+    num_mode <- optimize(function(x){
+        dprobdropout(x, mu=0, sigma2=3, rho=2, zeta=-3)
+    }, lower=-10, upper=10, maximum=TRUE)$maximum
+    expect_equal(mode, num_mode, tolerance=1e-5)
+
+    mode <- mode_probdropout(mu=0, sigma2=3, rho=2, zeta=3)
+    num_mode <- optimize(function(x){
+        dprobdropout(x, mu=0, sigma2=3, rho=2, zeta=3)
+    }, lower=-10, upper=10, maximum=TRUE)$maximum
+    expect_equal(mode, num_mode, tolerance=1e-5)
+
+    expect_gt(dprobdropout(mode, mu=0, sigma2=3, rho=2, zeta=3),
+              dprobdropout(mode-1, mu=0, sigma2=3, rho=2, zeta=3))
+    expect_gt(dprobdropout(mode, mu=0, sigma2=3, rho=2, zeta=3),
+              dprobdropout(mode+1, mu=0, sigma2=3, rho=2, zeta=3))
+    expect_gt(dprobdropout(mode, mu=0, sigma2=3, rho=2, zeta=3),
+              dprobdropout(mode-0.0001, mu=0, sigma2=3, rho=2, zeta=3))
+    expect_gt(dprobdropout(mode, mu=0, sigma2=3, rho=2, zeta=3),
+              dprobdropout(mode+0.0001, mu=0, sigma2=3, rho=2, zeta=3))
+
+    # The challenge is to find a parameter combination that breaks the function
+    expect_silent(mode_probdropout(mu=0, sigma2=3, rho=2, zeta=0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=3, rho=-2, zeta=0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=3, rho=2, zeta=-0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3))
+
+    expect_silent(mode_probdropout(mu=0, sigma2=30, rho=20, zeta=0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=30, rho=-20, zeta=0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=30, rho=20, zeta=-0.3))
+    expect_silent(mode_probdropout(mu=0, sigma2=30, rho=-20, zeta=-0.3))
+})

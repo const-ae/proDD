@@ -90,3 +90,30 @@ dprobdropout <- function(x, mu, sigma2,
         as.numeric(norm * apply(cumulative, 1, prod) / normalizer)
     }
 }
+
+
+
+#' Find the mode of the probabilistic dropout distribution function
+#'
+#' @section Warning:
+#' This function is not vectorized
+#'
+mode_probdropout <- function(mu, sigma2, rho, zeta){
+
+    if(zeta < 0){
+        # This is a dirty hack
+        lower <- mu - (abs(rho-mu)+1) * 50
+        upper <- mu
+    }else{
+        lower <- mu
+        upper <- mu + (abs(rho-mu)+1) * 50
+    }
+
+    mode <- uniroot(f=function(x){
+        (x-mu)/sigma2 - sign(zeta) *
+            sum(exp(dnorm(x, mean=rho, sd=abs(zeta), log=TRUE) -
+                        invprobit(x, rho, zeta, log=TRUE)))
+    }, lower=lower, upper=upper)$root
+    mode
+}
+
