@@ -15,7 +15,10 @@
 #' @param log boolean if the log of the result is returned
 #' @param oneminus boolean if one minus the result is returned
 #'
-#'
+#' @return a numeric vector of \code{length(x)}.
+#' @examples
+#'  xg <- seq(-5, 5, length.out=101)
+#'  plot(xg, invprobit(xg, rho=-2, zeta=-0.3))
 #' @export
 invprobit <- function(x, rho, zeta, log=FALSE, oneminus=FALSE){
     stopifnot(length(x) == length(rho) || length(rho) == 1)
