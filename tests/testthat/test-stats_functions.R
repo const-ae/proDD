@@ -33,4 +33,5 @@ test_that("invprobit fails on bad input", {
     expect_silent(pnorm(xg, mean=1:3, sd=0.1))
 
     expect_error(invprobit(xg, rho=1, zeta=c(1, -1)))
+    expect_silent(invprobit(0, rho=-3:3, zeta=1:7))
 })

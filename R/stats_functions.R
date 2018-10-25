@@ -21,8 +21,8 @@
 #'  plot(xg, invprobit(xg, rho=-2, zeta=-0.3))
 #' @export
 invprobit <- function(x, rho, zeta, log=FALSE, oneminus=FALSE){
-    stopifnot(length(x) == length(rho) || length(rho) == 1)
-    stopifnot(length(x) == length(zeta) || length(zeta) == 1)
+    stopifnot(length(x) == length(rho) || length(rho) == 1 || length(x) == 1)
+    stopifnot(length(x) == length(zeta) || length(zeta) == 1 || length(x) == 1)
 
     sign_sum <- sum(sign(zeta), na.rm=TRUE)
     if(length(zeta) > 1 && abs(sign_sum) < sum(!is.na(zeta), na.rm=TRUE))
