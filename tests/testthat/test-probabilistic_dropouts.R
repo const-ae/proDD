@@ -92,3 +92,36 @@ test_that("mode_probdropout works", {
     expect_silent(mode_probdropout(mu=0, sigma2=30, rho=20, zeta=-0.3))
     expect_silent(mode_probdropout(mu=0, sigma2=30, rho=-20, zeta=-0.3))
 })
+
+
+
+
+
+test_that("mean_probdropout works", {
+    expect_equal(mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-3),
+                 mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-3, approx=FALSE),
+                 tolerance=0.05)
+    expect_equal(mean_probdropout(mu=0, sigma2=3, rho=-2, zeta=-3),
+                 mean_probdropout(mu=0, sigma2=3, rho=-2, zeta=-3, approx=FALSE),
+                 tolerance=0.05)
+    # The approximation fails in this case
+    # expect_equal(mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-0.3),
+    #              mean_probdropout(mu=0, sigma2=3, rho=2, zeta=-0.3, approx=FALSE),
+    #              tolerance=0.05)
+    expect_equal(mean_probdropout(mu=0, sigma2=3, rho=2, zeta=0.3),
+                 mean_probdropout(mu=0, sigma2=3, rho=2, zeta=0.3, approx=FALSE),
+                 tolerance=0.05)
+    expect_equal(mean_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3),
+                 mean_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3, approx=FALSE),
+                 tolerance=0.05)
+
+})
+
+
+
+
+
+
+
+
+
