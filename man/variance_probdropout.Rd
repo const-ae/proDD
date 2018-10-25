@@ -7,9 +7,23 @@
 variance_probdropout(mu, sigma2, rho, zeta, log = FALSE, approx = TRUE)
 }
 \arguments{
+\item{mu}{double. The mean of the observed values.}
+
+\item{sigma2}{double. The variance of the mu estimate.}
+
+\item{rho}{vector. The positions of the inflection points of the dropout
+sigmoids for each sample. Can also be a single number that is repeated
+\code{nmis} times. Defaults to an empty vector.}
+
+\item{zeta}{vector.  The flattness of the dropout sigmoids for each sample.
+Can also be a single number that is repeated \code{nmis} times.
+Defaults to an empty vector.}
+
+\item{log}{boolean if the log of the density is returned.}
+
 \item{approx}{boolean. If TRUE match the probabilistic dropout
-distribution to a skewed normal distribution and use its mean as an
-approximation. If FALSE calculate the first moment using numerical
+distribution to a skewed normal distribution and use its variance as an
+approximation. If FALSE calculate the second moment using numerical
 integration}
 }
 \description{

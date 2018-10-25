@@ -95,6 +95,8 @@ dprobdropout <- function(x, mu, sigma2,
 
 #' Find the mode of the probabilistic dropout distribution function
 #'
+#' @inheritParams dprobdropout
+#'
 #' @section Warning:
 #' This function is not vectorized
 #'
@@ -126,6 +128,7 @@ mode_probdropout <- function(mu, sigma2, rho, zeta){
 
 #' Find the mean of  of the probabilistic dropout distribution function
 #'
+#' @inheritParams dprobdropout
 #' @param approx boolean. If TRUE match the probabilistic dropout
 #'   distribution to a skewed normal distribution and use its mean as an
 #'   approximation. If FALSE calculate the first moment using numerical
@@ -183,9 +186,11 @@ mean_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
 
 #' Find the variance of  of the probabilistic dropout distribution function
 #'
+#'
+#' @inheritParams dprobdropout
 #' @param approx boolean. If TRUE match the probabilistic dropout
-#'   distribution to a skewed normal distribution and use its mean as an
-#'   approximation. If FALSE calculate the first moment using numerical
+#'   distribution to a skewed normal distribution and use its variance as an
+#'   approximation. If FALSE calculate the second moment using numerical
 #'   integration
 #'
 #' @section Warning:
