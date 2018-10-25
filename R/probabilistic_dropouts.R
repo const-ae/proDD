@@ -40,6 +40,7 @@
 #'     Additive properties of skew normal random vectors.
 #'     J. Stat. Plan. Inference 126, 521–534 (2004).
 #'     doi:10.1016/j.jspi.2003.09.008
+#' @export
 dprobdropout <- function(x, mu, sigma2,
                          rho=numeric(0),
                          zeta=numeric(0),
