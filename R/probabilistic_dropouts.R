@@ -145,31 +145,11 @@ mean_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
     }
 
     if(approx){
-        # Laplace Approximation
-        mode <- mode_probdropout(mu, sigma2, rho, zeta)
-        variance <- -1 / (-1/sigma2 +
-                      sign(zeta) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
-                            invprobit(mode, rho, zeta))^2)) -
-                      sign(zeta) * (sum((mode-rho)/abs(zeta)^2 *
-                            dnorm(mode, mean=rho, sd=abs(zeta)) /
-                            invprobit(mode, rho, zeta))) )
-        # Match a skewed normal distribution to the probabilistic dropout
-        # with 5 points around the mode
-        points <-  c(0,1,-1,0.5,-0.5)
-        f <- dprobdropout(mode + points * sqrt(variance), mu, sigma2, rho=rho, zeta=zeta)
-        res <- optim(par=c(location=mode, omega=1, alpha=1), function(par){
-            location <- par[1]
-            omega <- par[2]
-            alpha <- par[3]
-            if(omega < 0) return(Inf)
-            approx_f <- sn::dsn(mode+ points * sqrt(variance), xi=location,
-                                omega=omega, alpha=alpha, tau=0)
-            sum((f - approx_f)^2)
-        })
+        sn_params <- match_probdropout_skewed_normal(mu, sigma2, rho, zeta)
         # Use the analytical formula to calculate the mean of the skewed normal
         # which approximates the mean of the probabilistic dropout distribution
-        ret <- res$par[1] + sqrt(2/pi) * res$par[2] *
-            res$par[3] / sqrt(1 + res$par[3]^2)
+        ret <- sn_params[1] + sqrt(2/pi) * sn_params[2] *
+            sn_params[3] / sqrt(1 + sn_params[3]^2)
         names(ret) <- NULL
         ret
     }else{
@@ -204,30 +184,11 @@ variance_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
     }
 
     if(approx){
-        # Laplace Approximation
-        mode <- mode_probdropout(mu, sigma2, rho, zeta)
-        variance <- -1 / (-1/sigma2 +
-                              sign(zeta) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
-                                                     invprobit(mode, rho, zeta))^2)) -
-                              sign(zeta) * (sum((mode-rho)/abs(zeta)^2 *
-                                                    dnorm(mode, mean=rho, sd=abs(zeta)) /
-                                                    invprobit(mode, rho, zeta))) )
-        # Match a skewed normal distribution to the probabilistic dropout
-        # with 5 points around the mode
-        points <-  c(0,1,-1,0.5,-0.5)
-        f <- dprobdropout(mode + points * sqrt(variance), mu, sigma2, rho=rho, zeta=zeta)
-        res <- optim(par=c(location=mode, omega=1, alpha=1), function(par){
-            location <- par[1]
-            omega <- par[2]
-            alpha <- par[3]
-            if(omega < 0) return(Inf)
-            approx_f <- sn::dsn(mode+ points * sqrt(variance), xi=location,
-                                omega=omega, alpha=alpha, tau=0)
-            sum((f - approx_f)^2)
-        })
+        sn_params <- match_probdropout_skewed_normal(mu, sigma2, rho, zeta)
         # Use the analytical formula to calculate the variance of the skewed normal
         # which approximates the variance of the probabilistic dropout distribution
-        ret <- res$par[2]^2 * (1 - 2 * (res$par[3] / sqrt(1 + res$par[3]^2))^2 / pi)
+        ret <- sn_params[2]^2 *
+            (1 - 2 * (sn_params[3] / sqrt(1 + sn_params[3]^2))^2 / pi)
         names(ret) <- NULL
         ret
     }else{
@@ -241,4 +202,35 @@ variance_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
 }
 
 
+#' Match a skewed normal distribution to the probabilistic dropout density
+#'
+#' Find the mode of probdropout density and take 5 points around the mode
+#' with a distance according to the Laplace approximation variance and calculate
+#' the parameters of the skewed normal that most closely matches those
+#' 5 points.
+#'
+#' @inheritParams dprobdropout
+match_probdropout_skewed_normal <- function(mu, sigma2, rho, zeta){
+    # Laplace Approximation
+    mode <- mode_probdropout(mu, sigma2, rho, zeta)
+    variance <- -1 / (-1/sigma2 +
+                          sign(zeta) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
+                                                 invprobit(mode, rho, zeta))^2)) -
+                          sign(zeta) * (sum((mode-rho)/abs(zeta)^2 *
+                                                dnorm(mode, mean=rho, sd=abs(zeta)) /
+                                                invprobit(mode, rho, zeta))) )
+    # 5 Point matching
+    points <-  c(0,1,-1,0.5,-0.5)
+    f <- dprobdropout(mode + points * sqrt(variance), mu, sigma2, rho=rho, zeta=zeta)
+    res <- optim(par=c(location=mode, omega=1, alpha=1), function(par){
+        location <- par[1]
+        omega <- par[2]
+        alpha <- par[3]
+        if(omega < 0) return(Inf)
+        approx_f <- sn::dsn(mode+ points * sqrt(variance), xi=location,
+                            omega=omega, alpha=alpha, tau=0)
+        sum((f - approx_f)^2)
+    })
+    res$par
+}
 
