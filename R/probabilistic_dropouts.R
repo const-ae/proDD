@@ -4,7 +4,7 @@
 #' Calculate the density under a censoring mechanism that probabilistically
 #' causes dropouts described with \code{rho} and \code{zeta}. The data is drawn
 #' from a normal with \code{mu} and \code{sigma2 * nobs}, but each value drops out with
-#' probability according to a sigmoid with its center at \code{rho} and width
+#' probability according to a inverse probit with its center at \code{rho} and width
 #' \code{zeta}:
 #' \deqn{
 #'   p(x | \mu, \sigma^2, \rho, \zeta) \propto f_{\text{Normal}}(x;\mu, \sigma^2)
@@ -19,9 +19,9 @@
 #' @param mu double. The mean of the observed values.
 #' @param sigma2 double. The variance of the mu estimate.
 #' @param rho vector. The positions of the inflection points of the dropout
-#'    sigmoids for each sample. Can also be a single number that is repeated
+#'    curves for each sample. Can also be a single number that is repeated
 #'    \code{nmis} times. Defaults to an empty vector.
-#' @param zeta vector.  The flattness of the dropout sigmoids for each sample.
+#' @param zeta vector.  The scale of the dropout curves for each sample.
 #'    Can also be a single number that is repeated \code{nmis} times.
 #'    Defaults to an empty vector.
 #' @param nmis integer The number of missing values.

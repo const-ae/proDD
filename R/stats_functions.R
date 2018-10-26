@@ -11,7 +11,7 @@
 #' @param rho numeric vector of length 1 or the same length as x. Specifies
 #'  the inflection point of the inverse probit curve.
 #' @param zeta numeric vector of length 1 or the same length as x. Specifies
-#'  how flat the curve is at the inflection point of the inverse probit curve.
+#'  the scale of the curve at the inflection point of the inverse probit curve.
 #' @param log boolean if the log of the result is returned
 #' @param oneminus boolean if one minus the result is returned
 #'

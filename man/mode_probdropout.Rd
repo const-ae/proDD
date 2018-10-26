@@ -12,10 +12,10 @@ mode_probdropout(mu, sigma2, rho, zeta)
 \item{sigma2}{double. The variance of the mu estimate.}
 
 \item{rho}{vector. The positions of the inflection points of the dropout
-sigmoids for each sample. Can also be a single number that is repeated
+curves for each sample. Can also be a single number that is repeated
 \code{nmis} times. Defaults to an empty vector.}
 
-\item{zeta}{vector.  The flattness of the dropout sigmoids for each sample.
+\item{zeta}{vector.  The scale of the dropout curves for each sample.
 Can also be a single number that is repeated \code{nmis} times.
 Defaults to an empty vector.}
 }
