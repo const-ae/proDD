@@ -18,6 +18,12 @@
 fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
                                       prev_zeta, prev_rho, maxit=5000){
 
+    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == length(sigma2p))
+    stopifnot(ncol(X) == length(experimental_design))
+    stopifnot(length(prev_zeta) == length(experimental_design) || length(prev_zeta) == 1)
+    stopifnot(length(prev_rho) == length(experimental_design) || length(prev_zeta) == 1)
+
     sigmoid_est <- optim(par=c(zeta=prev_zeta[1], rho=prev_rho[1]), function(par){
         if(par[1]  > 0) return(Inf)
         - sum(vapply(seq_len(ncol(X)), function(colidx){
@@ -35,14 +41,44 @@ fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
 
 
 #' @rdname fit_global_dropout_curves
-fit_sample_dropout_curves <- function(){
+fit_sample_dropout_curves <- function(X, mup, sigma2p, experimental_design,
+                                      prev_zeta, prev_rho, maxit=5000){
 
+    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == length(sigma2p))
+    stopifnot(ncol(X) == length(experimental_design))
+    stopifnot(length(prev_zeta) == length(experimental_design))
+    stopifnot(length(prev_rho) == length(experimental_design))
+
+    zeta <- numeric(length(prev_zeta))
+    rho <- numeric(length(prev_rho))
+    converged <- TRUE
+
+    # Calcualte one sigmoid for each column
+    for(colidx in seq_len(ncol(X))){
+        sigmoid_est <- optim(par=c(rho=prev_rho[colidx], zeta=prev_zeta[colidx]), function(par){
+            if(par[2]  > 0) return(Inf)
+            - (sum(invprobit(X[, colidx], par[1], par[2], log=TRUE, oneminus = TRUE), na.rm=TRUE) +
+                sum(invprobit(mup[which(is.na(c(X[, colidx]))), experimental_design[colidx]], par[1],
+                        par[2] * sqrt(1 + sigma2p[which(is.na(c(X[, colidx])))] / par[2]^2), log=TRUE)))
+        })
+        converged <- converged && sigmoid_est$convergence == 0
+        zeta[colidx] <- sigmoid_est$par[2]
+        rho[colidx] <- sigmoid_est$par[1]
+    }
+    list(zeta=zeta, rho=rho, converged=converged)
 }
 
 #' @rdname fit_global_dropout_curves
 fit_global_scale_dropout_curves <- function(X, mup, sigma2p, experimental_design,
                              prev_zeta, prev_rho,
                              max_iter=10, epsilon=1e-5){
+
+    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == length(sigma2p))
+    stopifnot(ncol(X) == length(experimental_design))
+    stopifnot(length(prev_zeta) == length(experimental_design) || length(prev_zeta) == 1)
+    stopifnot(length(prev_rho) == length(experimental_design))
 
     zeta <- mean(prev_zeta)
     rho <- prev_rho
