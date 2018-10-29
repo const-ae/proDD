@@ -7,12 +7,14 @@
 \title{Find the inverse probit parameters that best explain the pattern of missing
 values.}
 \usage{
-fit_global_dropout_curves()
+fit_global_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
+  prev_rho, maxit = 5000)
 
-fit_sample_dropout_curves()
+fit_sample_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
+  prev_rho, maxit = 5000)
 
 fit_global_scale_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
-  prev_rho, max_iter = 10, epsilon = 1e-07)
+  prev_rho, max_iter = 10, epsilon = 1e-05)
 }
 \description{
 There are three different modes for fitting the inverse probit dropout
@@ -21,6 +23,6 @@ curves:
 \item{fit_global_dropout_curves}{One curve for all samples}
 \item{fit_sample_dropout_curves}{One curve for each sample}
 \item{fit_global_scale_dropout_curves}{One curve for each sample,
-  but all have a common scale}
+  but all have a common scale (zeta)}
 }
 }

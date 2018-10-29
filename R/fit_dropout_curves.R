@@ -12,7 +12,7 @@
 #' \item{fit_global_dropout_curves}{One curve for all samples}
 #' \item{fit_sample_dropout_curves}{One curve for each sample}
 #' \item{fit_global_scale_dropout_curves}{One curve for each sample,
-#'   but all have a common scale}
+#'   but all have a common scale (zeta)}
 #' }
 #'
 fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
@@ -61,7 +61,7 @@ fit_sample_dropout_curves <- function(X, mup, sigma2p, experimental_design,
             - (sum(invprobit(X[, colidx], par[1], par[2], log=TRUE, oneminus = TRUE), na.rm=TRUE) +
                 sum(invprobit(mup[which(is.na(c(X[, colidx]))), experimental_design[colidx]], par[1],
                         par[2] * sqrt(1 + sigma2p[which(is.na(c(X[, colidx])))] / par[2]^2), log=TRUE)))
-        })
+        }, control=list(maxit=maxit))
         converged <- converged && sigmoid_est$convergence == 0
         zeta[colidx] <- sigmoid_est$par[2]
         rho[colidx] <- sigmoid_est$par[1]
