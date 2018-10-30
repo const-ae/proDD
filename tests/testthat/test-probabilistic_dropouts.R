@@ -91,6 +91,9 @@ test_that("mode_probdropout works", {
     expect_silent(mode_probdropout(mu=0, sigma2=30, rho=-20, zeta=0.3))
     expect_silent(mode_probdropout(mu=0, sigma2=30, rho=20, zeta=-0.3))
     expect_silent(mode_probdropout(mu=0, sigma2=30, rho=-20, zeta=-0.3))
+
+    # Handle multiple rhos and zeta
+    expect_silent(mode_probdropout(18, 0.03, rho=rep(18, 3), zeta=rep(-1, 3)))
 })
 
 

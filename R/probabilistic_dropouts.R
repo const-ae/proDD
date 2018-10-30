@@ -102,17 +102,17 @@ dprobdropout <- function(x, mu, sigma2,
 #'
 mode_probdropout <- function(mu, sigma2, rho, zeta){
 
-    if(zeta < 0){
+    if(zeta[1] < 0){
         # This is a dirty hack
-        lower <- mu - (abs(rho-mu)+1) * 50
+        lower <- mu - (abs(mean(rho)-mu)+1) * 50
         upper <- mu
     }else{
         lower <- mu
-        upper <- mu + (abs(rho-mu)+1) * 50
+        upper <- mu + (abs(mean(rho)-mu)+1) * 50
     }
 
     mode <- uniroot(f=function(x){
-        (x-mu)/sigma2 - sign(zeta) *
+        (x-mu)/sigma2 - sign(zeta[1]) *
             sum(exp(dnorm(x, mean=rho, sd=abs(zeta), log=TRUE) -
                         invprobit(x, rho, zeta, log=TRUE)))
     }, lower=lower, upper=upper)$root
@@ -214,9 +214,9 @@ match_probdropout_skewed_normal <- function(mu, sigma2, rho, zeta){
     # Laplace Approximation
     mode <- mode_probdropout(mu, sigma2, rho, zeta)
     variance <- -1 / (-1/sigma2 +
-                          sign(zeta) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
+                          sign(zeta[1]) * (sum((dnorm(mode, mean=rho, sd=abs(zeta)) /
                                                  invprobit(mode, rho, zeta))^2)) -
-                          sign(zeta) * (sum((mode-rho)/abs(zeta)^2 *
+                          sign(zeta[1]) * (sum((mode-rho)/abs(zeta)^2 *
                                                 dnorm(mode, mean=rho, sd=abs(zeta)) /
                                                 invprobit(mode, rho, zeta))) )
     # 5 Point matching
