@@ -129,9 +129,8 @@ calc_df_eff <- function(X, experimental_design){
 #' The methods returns \code{NA} for each feature with less than 2 observations.
 fit_unregularized_feature_variances <- function(X, rho, zeta,
                                                 experimental_design,
-                                                DF_eff=calc_df_eff(X, experimental_design),
                                                 upper=1000){
-
+    DF_eff <- calc_df_eff(X, experimental_design)
     N_cond <- length(unique(experimental_design))
     vapply(seq_len(nrow(X)), function(idx){
         nobs <- sum(! is.na(X[idx, ]))
@@ -235,5 +234,21 @@ fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
 }
 
 
+#' Fit a inverse Chi-squared variance prior
+#'
+#' Run maximum likelihood estimate on the density of the F distribution with
+#' the unregularized variance estimates.
+#'
+fit_variance_prior <- function(X, rho, zeta, experimental_design){
+    DF_eff <- calc_df_eff(X, experimental_design)
+    sigma2_unreg <- fit_unregularized_feature_variances(X, rho, zeta, experimental_design)
 
-
+    var_est <- optim(par=c(eta=1, nu=1), function(par){
+        if(par[1] < 0 || par[2] < 0 ) return(Inf)
+        - sum(sapply(seq_len(nrow(X))[DF_eff >= 1 & ! is.na(sigma2_unreg)], function(idx){
+            df(sigma2_unreg[idx]/par[1], df1=DF_eff[idx], df2=par[2], log=TRUE) - log(par[1])
+        }))
+    })
+    names(var_est$par) <- NULL
+    list(var_prior=var_est$par[1], df_prior=var_est$par[2])
+}

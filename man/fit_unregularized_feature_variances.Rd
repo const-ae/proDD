@@ -5,7 +5,7 @@
 \title{Find the variance without using the regularization}
 \usage{
 fit_unregularized_feature_variances(X, rho, zeta, experimental_design,
-  DF_eff = calc_df_eff(X, experimental_design), upper = 1000)
+  upper = 1000)
 }
 \description{
 This method is important for finding the variance prior hyperparameters.
