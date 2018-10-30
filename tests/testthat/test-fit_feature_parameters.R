@@ -43,7 +43,7 @@ test_that("fit_feature_means works", {
                                                 nu=10, eta=0.3, mu0=20, sigma20=10,
                                                 experimental_design = rep(1, N_rep))
 
-    mup <- fit_feature_means(data$X, sigma2p=sigma2p, sigma2mus=sigma2mus,
+    mup <- fit_feature_means(data$X, sigma2p=sigma2p, sigma2mus=sigma2mup,
                              rho=rep(18, N_rep), zeta=rep(-1, N_rep),
                              nu=10, eta=0.3, mu0=20, sigma20=10,
                              experimental_design = rep(1, N_rep))
