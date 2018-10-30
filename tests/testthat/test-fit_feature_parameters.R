@@ -53,3 +53,24 @@ test_that("fit_feature_means works", {
 
 
 })
+
+
+
+test_that("unregularized variance estimates work", {
+    N_rep <- 10
+    data <- generate_synthetic_data(n_rows = 500, n_replicates = N_rep,
+                                    rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+
+    sigma2_unreg <- fit_unregularized_feature_variances(data$X,
+                                        rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                        experimental_design=rep(1, N_rep))
+
+    nobs <- rowSums(! is.na(data$X))
+    expect_equal(which(is.na(sigma2_unreg)), which(nobs <= 1))
+
+    sigma2p <- fit_feature_variances(data$X, data$mus, rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                     nu=10, eta=0.3, experimental_design = rep(1, N_rep))
+
+    expect_gt(cor(sigma2p, sigma2_unreg, use = "complete.obs"), 0.8)
+})
