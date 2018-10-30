@@ -27,3 +27,29 @@ test_that("fit_feature_variances works", {
               sum((data$sigmas2[! is.na(simple_vars)] - simple_vars[! is.na(simple_vars)])^2))
 
 })
+
+
+
+test_that("fit_feature_means works", {
+    N_rep <- 10
+    data <- generate_synthetic_data(n_rows = 1e3, n_replicates = N_rep,
+                                    rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+
+    sigma2p <- fit_feature_variances(data$X, data$mus, rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                     nu=10, eta=0.3, experimental_design = rep(1, N_rep))
+
+    sigma2mup <- fit_feature_mean_uncertainties(data$X, rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                                                nu=10, eta=0.3, mu0=20, sigma20=10,
+                                                experimental_design = rep(1, N_rep))
+
+    mup <- fit_feature_means(data$X, sigma2p=sigma2p, sigma2mus=sigma2mus,
+                             rho=rep(18, N_rep), zeta=rep(-1, N_rep),
+                             nu=10, eta=0.3, mu0=20, sigma20=10,
+                             experimental_design = rep(1, N_rep))
+
+    nobs <- rowSums(! is.na(data$X))
+    expect_gt(cor(data$mus[nobs != 0], mup[nobs != 0]), 0.99)
+
+
+})
