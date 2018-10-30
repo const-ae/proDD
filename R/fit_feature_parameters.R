@@ -167,12 +167,9 @@ fit_unregularized_feature_variances <- function(X, rho, zeta,
                         v2 <- tryCatch({integrate(function(mu){
                             exp(-1/(2 * .sigma2) * nobs * (muobs-mu-muobs)^2) * (
                                 if(! any(is.na(x))) 1
-                                else if(zetastar[1] >= 0)
-                                    apply(msply_dbl(which(experimental_design == cond & is.na(X[idx, ])), function(hidx)
-                                        pnorm(mu-muobs, rho[hidx], sd=zetastar[hidx])), 2, prod)
                                 else
                                     apply(msply_dbl(which(experimental_design == cond & is.na(X[idx, ])), function(hidx)
-                                        pnorm(mu-muobs, rho[hidx], sd=abs(zetastar[hidx]), lower.tail = FALSE)), 2, prod)
+                                        invprobit(mu-muobs, rho[hidx], zetastar[hidx])), 2, prod)
                             )
                         }, lower=-Inf, upper=Inf)$value
                         }, error=function(err){warning("sigma2_adapted_approx:\n");warning(err); 0})
