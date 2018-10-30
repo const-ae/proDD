@@ -92,3 +92,15 @@ test_that("unregularized mean estimates work", {
     expect_gt(diag(cor(data$mus, mu_unreg, use = "complete.obs"))[2], 0.99)
 })
 
+
+test_that("inferring the location prior works", {
+    N_rep <- 10
+    data <- generate_synthetic_data(n_rows = 1000, n_replicates = N_rep, n_conditions = 2,
+                                    rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+    loc_prior <- fit_location_prior(data$X, data$mus, rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
+                                    experimental_design=rep(1:2, each=N_rep))
+
+    expect_equal(loc_prior$mu0, 20, tolerance=0.1)
+    expect_equal(loc_prior$sigma20, 10, tolerance=0.1)
+})

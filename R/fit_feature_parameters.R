@@ -217,6 +217,23 @@ fit_unregularized_feature_means <- function(X, mup, mu0, zeta, rho, experimental
 
 
 
+#' Fit a Gaussian location prior over all samples
+#'
+#' The function takes the regularized feature means. The global mu0 is the
+#' mean of the regularized feature means. It then calculates the unregularized
+#' feature means right of the global mean (so that missing values are less
+#' problematic). The global variance estimate is the variance of those
+#' unregularized values to the global mean.
+#'
+#' @return list with elements mu0 and sigma20
+#'
+fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
+    mu0 <- mean(mup, na.rm=TRUE)
+    mu_unreg <- fit_unregularized_feature_means(X, mup, mu0, zeta, rho, experimental_design)
+    sigma20 <- sum((mu_unreg[! is.na(mu_unreg)] - mu0)^2/sum(! is.na(mu_unreg)))
+    list(mu0=mu0, sigma20=sigma20)
+}
+
 
 
 
