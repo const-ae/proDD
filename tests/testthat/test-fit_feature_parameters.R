@@ -118,3 +118,30 @@ test_that("inferring the variance prior works", {
     expect_equal(var_prior$df_prior, 10, tolerance=1)
 })
 
+
+
+
+test_that("everything ties together", {
+    N_rep <- 10
+    data <- generate_synthetic_data(n_rows = 100, n_replicates = N_rep, n_conditions = 2,
+                                    rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+    result <- fit_hyperparameters(data$X, experimental_design=rep(1:2, each=N_rep),
+                                  dropout_curve_calc = "global", verbose=FALSE)
+
+    expect_equal(result$params$eta, 0.3, tolerance=0.1)
+    expect_equal(result$params$nu, 10, tolerance=1)
+    expect_equal(result$params$mu0, 20, tolerance=1)
+    expect_equal(result$params$sigma20, 10, tolerance=1)
+    expect_equal(result$params$rho[1], 18, tolerance=1)
+    expect_equal(result$params$zeta[1], -1, tolerance=0.1)
+
+})
+
+
+
+
+
+
+
+

@@ -18,7 +18,7 @@
 fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
                                       prev_zeta, prev_rho, maxit=5000){
 
-    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == nrow(mup))
     stopifnot(nrow(X) == length(sigma2p))
     stopifnot(ncol(X) == length(experimental_design))
     stopifnot(length(prev_zeta) == length(experimental_design) || length(prev_zeta) == 1)
@@ -44,7 +44,7 @@ fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
 fit_sample_dropout_curves <- function(X, mup, sigma2p, experimental_design,
                                       prev_zeta, prev_rho, maxit=5000){
 
-    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == nrow(mup))
     stopifnot(nrow(X) == length(sigma2p))
     stopifnot(ncol(X) == length(experimental_design))
     stopifnot(length(prev_zeta) == length(experimental_design))
@@ -74,7 +74,7 @@ fit_global_scale_dropout_curves <- function(X, mup, sigma2p, experimental_design
                              prev_zeta, prev_rho,
                              max_iter=10, epsilon=1e-5){
 
-    stopifnot(nrow(X) == length(mup))
+    stopifnot(nrow(X) == nrow(mup))
     stopifnot(nrow(X) == length(sigma2p))
     stopifnot(ncol(X) == length(experimental_design))
     stopifnot(length(prev_zeta) == length(experimental_design) || length(prev_zeta) == 1)
