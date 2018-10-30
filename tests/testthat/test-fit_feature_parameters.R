@@ -74,3 +74,21 @@ test_that("unregularized variance estimates work", {
 
     expect_gt(cor(sigma2p, sigma2_unreg, use = "complete.obs"), 0.8)
 })
+
+
+
+test_that("unregularized mean estimates work", {
+    N_rep <- 10
+    data <- generate_synthetic_data(n_rows = 500, n_replicates = N_rep, n_conditions = 2,
+                                    rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+
+    mu_unreg <- fit_unregularized_feature_means(data$X, data$mus, mu0=20,
+                                                    rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
+                                                    experimental_design=rep(1:2, each=N_rep))
+
+
+    expect_gt(diag(cor(data$mus, mu_unreg, use = "complete.obs"))[1], 0.99)
+    expect_gt(diag(cor(data$mus, mu_unreg, use = "complete.obs"))[2], 0.99)
+})
+

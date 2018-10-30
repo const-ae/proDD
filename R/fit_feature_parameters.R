@@ -185,3 +185,38 @@ fit_unregularized_feature_variances <- function(X, rho, zeta,
     }, FUN.VALUE=0.0)
 }
 
+
+
+
+#' Calculate the unregularized means for all rows for which mup is larger than mu0
+#'
+#'
+fit_unregularized_feature_means <- function(X, mup, mu0, zeta, rho, experimental_design){
+    N_cond <- length(unique(experimental_design))
+    mply_dbl(seq_len(nrow(X)), ncol=N_cond, function(idx){
+        sapply(seq_len(N_cond), function(cond){
+            x <- X[idx, which(experimental_design == cond)]
+            sel <- which(experimental_design == cond & is.na(X[idx,]))
+            nobs <- sum(! is.na(x))
+            if(nobs < 2 || mup[idx, cond] < mu0){
+                NA
+            }else{
+                sigma2 <-  var(x, na.rm=TRUE)
+                sigma2mu <- sigma2 / nobs
+                mu <- mean(x, na.rm=TRUE)
+                zetastar <- zeta * sqrt(1 + sigma2/zeta^2)
+                tryCatch(
+                    mean_probdropout(mu, sigma2=sigma2mu, rho=rho[sel],
+                                     zeta=zetastar[sel]),
+                    error=function(err) NA
+                )
+            }
+        })
+    })
+}
+
+
+
+
+
+
