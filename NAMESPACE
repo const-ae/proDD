@@ -3,3 +3,6 @@
 export(dprobdropout)
 export(generate_synthetic_data)
 export(invprobit)
+export(resampling_test)
+importFrom(Rcpp,sourceCpp)
+useDynLib(proDD, .registration = TRUE)

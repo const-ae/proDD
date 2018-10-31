@@ -15,4 +15,7 @@ RoxygenNote: 6.0.1
 Imports: 
     mvtnorm,
     sn,
-    extraDistr
+    extraDistr,
+    Rcpp
+LinkingTo: 
+    Rcpp

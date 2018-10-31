@@ -1,5 +1,10 @@
 
 
+#' @useDynLib proDD, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+NULL
+
+
 #' apply function that always returns a numeric matrix
 #'
 #' The function is modelled after `vapply`, but always returns a matrix
