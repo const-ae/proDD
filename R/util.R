@@ -1,7 +1,11 @@
 
 
 #' @useDynLib proDD, .registration = TRUE
-#' @importFrom Rcpp sourceCpp
+#' @import methods
+#' @import rstantools
+#' @import Rcpp
+#' @importFrom Rcpp sourceCpp loadModule
+#' @importFrom rstan sampling
 NULL
 
 

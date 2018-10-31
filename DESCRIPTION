@@ -11,11 +11,19 @@ Encoding: UTF-8
 LazyData: true
 Suggests: 
     testthat
-RoxygenNote: 6.0.1
 Imports: 
     mvtnorm,
     sn,
     extraDistr,
-    Rcpp
+    Rcpp,
+    rstan (>= 2.17.3),
+    rstantools (>= 1.5.1)
 LinkingTo: 
-    Rcpp
+    BH (>= 1.66.0-1),
+    Rcpp (>= 0.12.18),
+    RcppEigen (>= 0.3.3.4.0),
+    rstan (>= 2.17.3),
+    StanHeaders (>= 2.17.2)
+NeedsCompilation: yes
+SystemRequirements: GNU make
+RoxygenNote: 6.0.1
