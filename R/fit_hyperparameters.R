@@ -15,6 +15,7 @@
 fit_hyperparameters <- function(X, experimental_design,
                                 dropout_curve_calc=c("global", "global_scale", "sample"),
                                 frac_subsample=1.0, n_subsample=round(nrow(X) * frac_subsample),
+                                calculate_distance=TRUE,
                                 max_iter=10, epsilon=1e-3, verbose=FALSE){
 
     dropout_curve_calc <- match.arg(dropout_curve_calc, c("global", "global_scale", "sample"))
@@ -136,8 +137,16 @@ fit_hyperparameters <- function(X, experimental_design,
     }
 
     names(last_round_params) <- c("eta", "nu", "mu0", "sigma20", "rho", "zeta")
-    list(params = last_round_params,
-         error=error, converged=converged)
+    if(! calculate_distance){
+        list(params = last_round_params,
+             error=error, converged=converged)
+    }else{
+        mis <- find_approx_for_missing(X, mup, mu_vars, sigma2p, rho, zeta, experimental_design)
+        dist_res <- dist_approx(t(X), t(mis$mu_mis), t(mis$var_mis))
+        list(params = last_round_params,
+             error=error, converged=converged, distance=dist_res)
+    }
+
 
 }
 

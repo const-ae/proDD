@@ -6,7 +6,8 @@
 \usage{
 fit_hyperparameters(X, experimental_design, dropout_curve_calc = c("global",
   "global_scale", "sample"), frac_subsample = 1, n_subsample = round(nrow(X)
-  * frac_subsample), max_iter = 10, epsilon = 0.001, verbose = FALSE)
+  * frac_subsample), calculate_distance = TRUE, max_iter = 10,
+  epsilon = 0.001, verbose = FALSE)
 }
 \description{
 Iteratively update the hyperparameter until convergence
