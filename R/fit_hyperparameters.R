@@ -141,6 +141,7 @@ fit_hyperparameters <- function(X, experimental_design,
         list(params = last_round_params,
              error=error, converged=converged)
     }else{
+        if(verbose) message("Calculate distance matrix")
         mis <- find_approx_for_missing(X, mup, mu_vars, sigma2p, rho, zeta, experimental_design)
         dist_res <- dist_approx(t(X), t(mis$mu_mis), t(mis$var_mis))
         list(params = last_round_params,
