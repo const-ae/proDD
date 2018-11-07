@@ -18,7 +18,7 @@ median_normalization <- function(X){
     stopifnot(is.matrix(X))
     Xnorm <- X
     for(idx in 1:ncol(X)){
-        Xnorm[, idx, drop=FALSE] <- X[, idx, drop=FALSE] -
+        Xnorm[, idx] <- X[, idx, drop=FALSE] -
             median(X[, idx, drop=FALSE] - rowMeans(X, na.rm=TRUE), na.rm=TRUE )
     }
     Xnorm

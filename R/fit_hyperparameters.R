@@ -19,6 +19,9 @@ fit_hyperparameters <- function(X, experimental_design,
 
     dropout_curve_calc <- match.arg(dropout_curve_calc, c("global", "global_scale", "sample"))
 
+    experimental_design_fct <- as.factor(experimental_design)
+    experimental_design <- as.numeric(experimental_design_fct)
+
     N_cond <- length(unique(experimental_design))
     if(n_subsample >= nrow(X)){
         # do nothing ...
