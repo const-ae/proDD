@@ -4,24 +4,78 @@
 \alias{generate_synthetic_data}
 \title{Generate a data set according to the probabilistic dropout model}
 \usage{
-generate_synthetic_data(n_rows, n_replicates,
+generate_synthetic_data(n_rows, experimental_design = NULL,
+  n_replicates = as.numeric(table(experimental_design)),
   n_conditions = length(n_replicates), frac_changed = 0.1,
-  n_changed = round(n_rows * min(1, frac_changed)),
-  experimental_design = c(unlist(mapply(rep, seq_len(n_conditions),
-  n_replicates))), mu0 = 20, sigma20 = 10, nu = 3, eta = 0.3,
-  rho = rep(18, times = if (length(n_replicates) == 1) n_replicates *
-  n_conditions else sum(n_replicates)), zeta = rep(-1, times = if
+  n_changed = round(n_rows * min(1, frac_changed)), mu0 = 20,
+  sigma20 = 10, nu = 3, eta = 0.3, rho = rep(18, times = if
   (length(n_replicates) == 1) n_replicates * n_conditions else
-  sum(n_replicates)))
+  sum(n_replicates)), zeta = rep(-1, times = if (length(n_replicates) == 1)
+  n_replicates * n_conditions else sum(n_replicates)))
 }
 \arguments{
 \item{n_rows}{integer. The number of rows in the new dataset}
 
-\item{n_replicates}{integer or vector. The number of replicates in each
-condition}
+\item{experimental_design}{a vector that specifies which samples belong
+to the same condition. Default: `NULL` in which case `n_replicates` must
+be specified}
 
-\item{n_conditions}{}
+\item{n_replicates}{integer or vector. The number of replicates in each
+condition.}
+
+\item{n_conditions}{The number of conditions. Setting `n_replicates=3` and
+`n_conditions=2` is equal to specifying `experimental_design=c(1,1,1,2,2,2)`.}
+
+\item{frac_changed}{the fraction of rows for which different means are drawn
+for each conditon.}
+
+\item{n_changed}{alternative way to specify for how many rows have different
+means in each condition.}
+
+\item{mu0}{the global mean around which the row means are drawn. Default `20`}
+
+\item{sigma20}{the global variance specifying the spread of means around `mu0`.
+Default `10`.}
+
+\item{nu}{degrees of freedom for the the global variance prior. Default `3`.}
+
+\item{eta}{scale of the global variance prior. Default `0.3`.}
+
+\item{rho}{vector specifying the intensity where the chance of a dropout is
+50/50. Either length one or same length as `n_replicates * n_conditons` or
+`length(experimental_design)` respectively. Default `18`.}
+
+\item{zeta}{vector specifying the scale of the dropout curve.
+Either length one or same length as `n_replicates * n_conditons` or
+`length(experimental_design)` respectively. Default `18`.}
+}
+\value{
+a list with 5 elements
+  \describe{
+    \item{X}{the data matrix with missing values}
+    \item{t_X}{the true data matrix, before data dropped out}
+    \item{mus}{matrix of size `n_rows * n_conditions`. The true means
+     for each condition}
+    \item{sigmas2}{a vector of size `n_rows`. The true variance for each row.}
+    \item{changed}{a boolean vector of size `n_rows`, with the label if a row
+    has different means for each condition}
+  }
 }
 \description{
-Generate a data set according to the probabilistic dropout model
+Specify the number of rows in the dataset, the number of conditions and
+replicates, how many proteins have a different mean and a few additional
+hyperparameters and get a synthetic dataset the is similar to data from a
+real label-free mass spectrometry experiment.
+}
+\examples{
+ data <- generate_synthetic_data(n_rows=10,
+                n_replicates=3, n_conditions=2)
+
+ data2 <- generate_synthetic_data(n_rows=10,
+                experimental_design=c(1,1,1,2,2,2))
+
+ data3 <- generate_synthetic_data(n_rows=10,
+                rep(letters[1:3], each=4))
+
+
 }

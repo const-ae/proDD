@@ -36,4 +36,7 @@ test_that("generating new data works", {
     expect_silent(generate_synthetic_data(n_rows=0, n_replicates = 10))
     expect_error(generate_synthetic_data(n_rows=10, n_replicates = c(1, 0, 3)))
 
+    experimental_design <- c("c1","c2","c1","c2","c1")
+    d7 <- generate_synthetic_data(n_rows=100, experimental_design = experimental_design)
+    expect_equal(colnames(d7$X), experimental_design)
 })
