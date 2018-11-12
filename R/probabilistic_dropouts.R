@@ -83,7 +83,17 @@ dprobdropout <- function(x, mu, sigma2,
         normalizer <- mvtnorm::pmvnorm(lower=rep(0, times=nmis), upper=rep(Inf, times=nmis), mean=rho - mu,
                                        sigma=zeta^2 * diag(nmis) + matrix(sigma2, nrow=nmis, ncol=nmis))
     }
-
+    # Avoid returning nonesense
+    if(normalizer == 0){
+        mode <- mode_probdropout(mu, sigma2, rho, zeta)
+        normalizer <- integrate(function(x){
+            norm <- dnorm(x + mode, mean=mu, sd=sqrt(sigma2))
+            cumulative <- mply_dbl(x + mode, function(.x) {
+                invprobit(.x, rho, zeta)
+            }, ncol=nmis)
+            norm * apply(cumulative, 1, prod)
+        }, lower=-Inf, upper=Inf)$value
+    }
     if(log){
         as.numeric(norm + apply(cumulative, 1, sum) - log(normalizer))
     }else{

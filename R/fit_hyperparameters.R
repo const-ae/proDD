@@ -15,7 +15,6 @@
 fit_hyperparameters <- function(X, experimental_design,
                                 dropout_curve_calc=c("global", "global_scale", "sample"),
                                 frac_subsample=1.0, n_subsample=round(nrow(X) * frac_subsample),
-                                calculate_distance=TRUE,
                                 max_iter=10, epsilon=1e-3, verbose=FALSE){
 
     dropout_curve_calc <- match.arg(dropout_curve_calc, c("global", "global_scale", "sample"))
@@ -25,7 +24,8 @@ fit_hyperparameters <- function(X, experimental_design,
 
     N_cond <- length(unique(experimental_design))
     if(n_subsample >= nrow(X)){
-        # do nothing ...
+        X_bckp <- X
+        sel <- seq_len(nrow(X))
     }else if(n_subsample > 0 && n_subsample < nrow(X)){
         X_bckp <- X
         sel <- sample(seq_len(nrow(X_bckp)), n_subsample)
@@ -137,17 +137,35 @@ fit_hyperparameters <- function(X, experimental_design,
     }
 
     names(last_round_params) <- c("eta", "nu", "mu0", "sigma20", "rho", "zeta")
-    if(! calculate_distance){
-        list(params = last_round_params,
-             error=error, converged=converged)
-    }else{
-        if(verbose) message("Calculate distance matrix")
-        mis <- find_approx_for_missing(X, mup, mu_vars, sigma2p, rho, zeta, experimental_design)
-        dist_res <- dist_approx(t(X), t(mis$mu_mis), t(mis$var_mis))
-        list(params = last_round_params,
-             error=error, converged=converged, distance=dist_res)
+
+    feature_params <- list(
+        mup=matrix(NA, nrow=nrow(X_bckp), ncol=N_cond),
+        sigma2p=rep(NA, times=nrow(X_bckp)),
+        sigma2mup=matrix(NA, nrow=nrow(X_bckp), ncol=N_cond)
+    )
+    feature_params$mup[sel, ] <- mup
+    feature_params$sigma2p[sel] <- sigma2p
+    feature_params$sigma2mup[sel, ] <- mu_vars
+
+    colnames(feature_params$mup) <- levels(experimental_design_fct)
+    colnames(feature_params$sigma2mup) <- levels(experimental_design_fct)
+    rownames(feature_params$mup) <- rownames(X_bckp)
+    rownames(feature_params$sigma2mup) <-  rownames(X_bckp)
+
+    antisel <- setdiff(seq_len(nrow(X_bckp)), sel)
+    if(length(antisel) > 0){
+        if(verbose) message(paste0("Predicting features which were not in the subsample: ",
+                                   length(antisel), " elements."))
+        add_feats <- predict_feature_parameters(X_bckp[antisel, ], experimental_design_fct,
+                                                last_round_params, verbose=verbose)
+        feature_params$mup[antisel, ] <- add_feats$mup
+        feature_params$sigma2p[antisel] <- add_feats$sigma2p
+        feature_params$sigma2mup[antisel, ] <- add_feats$sigma2mup
     }
 
+    list(hyper_params = last_round_params,
+         feature_params = feature_params,
+         error=error, converged=converged)
 
 }
 

@@ -4,11 +4,12 @@
 \alias{dist_approx}
 \title{Distance matrix computation respecting nonrandom missing values}
 \usage{
-dist_approx(X, mu_mis = NULL, var_mis = NULL, experimental_design = NULL,
-  hyperparameters = NULL, ...)
+dist_approx(X, mu_mis = NULL, var_mis = NULL, feature_params = NULL,
+  rho = NULL, zeta = NULL, hyper_params = NULL,
+  experimental_design = NULL, ...)
 }
 \arguments{
-\item{X}{the transposed (!) data matrix}
+\item{X}{the data matrix}
 
 \item{mu_mis}{mean of the replacement values. Can be a single number, a
 vector with one number for each sample or a matrix with the same dimensions
@@ -18,11 +19,18 @@ as X.}
 vector with one number for each sample or a matrix with the same dimensions
 as X.}
 
-\item{experimental_design}{if no good replacement values are available
-you can provide the experimental_design vector}
+\item{feature_params}{a list with three elements (mup, sigma2mup and sigma2p)}
 
-\item{hyperparameters}{a list with four elements (mu0, sigma20, rho and zeta),
+\item{rho}{the dropout curve positions. Necessary if you call the function with
+`feature_params`.}
+
+\item{zeta}{the dropout curve width Necessary if you call the function with
+`feature_params`.}
+
+\item{hyper_params}{a list with four elements (mu0, sigma20, rho and zeta),
 that are used to calculate a good replacement value.}
+
+\item{experimental_design}{assignment to which condition each sample belongs.}
 }
 \description{
 The method calculates the distances between each row of the matrix X and
@@ -31,9 +39,16 @@ be calculated instead realistic values for the missing values are considered
 and the mean with the corresponding variance is calculated for each distance.
 }
 \details{
-If no appropriate replacement values are available and the method is called
-without any parameter in addition to X, it calls `fit_hyperparameters` and
-infers them.
+If no appropriate replacement values are available you can call it with
+`feature_params` which provide the mean and variance for each feature and
+condition. Combined with `rho` and `zeta` they can be used to determine
+the replacement values. If also no `feature_params` are available, you
+can also just call the function with `hyper_params` and all of the above
+values are calculated. In both cases it is necessary to provide the
+`experimental_design` parameter so there is a clear mapping between
+sample and condition. In case mu_mis and var_mis are inferred, the
+\code{length(experimental_design)} is used to determine if `X` needs to be
+transposed before inferring the parameters.
 }
 \seealso{
 stats::dist

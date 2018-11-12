@@ -129,12 +129,32 @@ test_that("everything ties together", {
     result <- fit_hyperparameters(data$X, experimental_design=rep(1:2, each=N_rep),
                                   dropout_curve_calc = "global", verbose=FALSE)
 
-    expect_equal(result$params$eta, 0.3, tolerance=0.1)
-    expect_equal(result$params$nu, 10, tolerance=1)
-    expect_equal(result$params$mu0, 20, tolerance=1)
-    expect_equal(result$params$sigma20, 10, tolerance=1)
-    expect_equal(result$params$rho[1], 18, tolerance=1)
-    expect_equal(result$params$zeta[1], -1, tolerance=0.1)
+    expect_equal(result$hyper_params$eta, 0.3, tolerance=0.1)
+    expect_equal(result$hyper_params$nu, 10, tolerance=1)
+    expect_equal(result$hyper_params$mu0, 20, tolerance=1)
+    expect_equal(result$hyper_params$sigma20, 10, tolerance=1)
+    expect_equal(result$hyper_params$rho[1], 18, tolerance=1)
+    expect_equal(result$hyper_params$zeta[1], -1, tolerance=0.2)
+
+})
+
+
+test_that("predicting features for new data works", {
+    experimental_design <- rep(LETTERS[1:2], each=4)
+    data <- generate_synthetic_data(n_rows = 200, experimental_design,
+                                    rho=18, zeta=-1.2,
+                                    nu=10, eta=0.3, mu0=20, sigma20=10)
+    result <- fit_hyperparameters(data$X, experimental_design, frac_subsample = 1,
+                                  dropout_curve_calc = "global", verbose=TRUE)
+
+
+    new_res <- predict_feature_parameters(data$X, experimental_design, result$hyper_params,
+                                          verbose=TRUE)
+
+
+    expect_equal(result$feature_params$mup, new_res$mup, tolerance=0.01)
+    expect_equal(result$feature_params$sigma2p, new_res$sigma2p, tolerance=0.01)
+    expect_equal(result$feature_params$sigma2mup, new_res$sigma2mup, tolerance=0.01)
 
 })
 

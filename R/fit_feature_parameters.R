@@ -3,6 +3,130 @@
 
 
 
+#' Find feature parameters for elements of X with a fixed set of hyperparameters
+#'
+#' @param X data matrix
+#' @param experimental_design a vector that specifies which samples belong
+#'   to the same condition.
+#' @param hyper_params a list with 5 elements (`eta`, `nu`, `mu0`, `sigma20`,
+#'   `rho`, and `zeta`). Alternatively the `hyper_params` can be specified
+#'   individually.
+#' @param mu0 the global mean around which the row means are drawn
+#' @param sigma20 the global variance specifying the spread of means around `mu0`.
+#' @param nu degrees of freedom for the the global variance prior.
+#' @param eta scale of the global variance prior.
+#' @param rho vector specifying the intensity where the chance of a dropout is
+#'   50/50. Length is either one or \code{ncol(X)}.
+#' @param zeta vector specifying the scale of the dropout curve.
+#'   Length is either one or \code{ncol(X)}.
+#' @param mup Optional matrix that fixes the mean for each row and condition. Default `NULL`
+#' @param sigma2p Optional vector that fixes the variance for each row. Default `NULL`
+#' @param sigma2mup Optional matrix that fixes the uncertainty of the mean
+#'  for each row and condition. Default `NULL`.
+#' @param max_iter the maximum number of iterations. Default: 10
+#' @param epsilon the error under which the result is considered converged.
+#'   Default: 0.001
+#' @param verbose boolean that indicates if verbose output is printed to the console.
+#'
+#' @return list with three elements
+#'   \describe{
+#'     \item{mup}{a matrix with size \code{nrow(X) * unique(experimental_design)}
+#'       with the means for each feature}
+#'     \item{sigma20}{a numeric vector with the variance for each feature}
+#'     \item{sigma2mup}{a matrix with size \code{nrow(X) * unique(experimental_design)}
+#'       with the uncertainty for each `mup`}
+#'   }
+#'
+predict_feature_parameters <- function(X, experimental_design, hyper_params=NULL,
+                                       mu0, sigma20, nu, eta, rho, zeta,
+                                       mup=NULL, sigma2p=NULL, sigma2mup=NULL,
+                                       max_iter=10, epsilon=1e-3, verbose=FALSE){
+
+    if(! is.null(hyper_params)){
+        mu0 <- hyper_params$mu0
+        sigma20 <- hyper_params$sigma20
+        nu <- hyper_params$nu
+        eta <- hyper_params$eta
+        rho <- hyper_params$rho
+        zeta <- hyper_params$zeta
+    }
+    if(length(rho) == 1){
+        rho <- rep(rho, times=ncol(X))
+    }
+    if(length(zeta) == 1){
+        zeta <- rep(zeta, times=ncol(X))
+    }
+
+    fixed_mup <- ! is.null(mup)
+    fixed_mu_vars <- ! is.null(sigma2mup)
+    mu_vars <- sigma2mup
+    fixed_sigma2p <- ! is.null(sigma2p)
+
+    experimental_design_fct <- as.factor(experimental_design)
+    experimental_design <- as.numeric(experimental_design_fct)
+
+    N_cond <- length(unique(experimental_design))
+
+    # Initialize the parameters
+    if(! fixed_mup){
+        mup <-  matrix(mu0, nrow=nrow(X), ncol=N_cond)
+    }
+    if(! fixed_sigma2p){
+        sigma2p <-  rep(sigma20, times=nrow(X))
+    }
+    if(! fixed_mu_vars){
+        mu_vars <- matrix(eta, nrow=nrow(X), ncol=N_cond)
+    }
+
+
+    last_round_params <- list(mup, sigma2p, mu_vars)
+    converged <- FALSE
+    iter <- 1
+    while(! converged && iter < max_iter){
+        if(verbose) message(paste0("Starting iter ", iter))
+        # Make a good estimate for each feature
+        if(! fixed_sigma2p){
+            sigma2p <- fit_feature_variances(X, mup, rho, zeta, nu, eta, experimental_design)
+
+        }
+        if(! fixed_mu_vars){
+            mu_vars <- fit_feature_mean_uncertainties(X, rho, zeta, nu, eta, mu0,
+                                                      sigma20, experimental_design)
+        }
+        if(! fixed_mup){
+            mup <- fit_feature_means(X, sigma2p, mu_vars, rho, zeta, nu, eta, mu0,
+                                     sigma20, experimental_design)
+        }
+
+
+        # Calculate error
+        error <- sum(mapply(function(new, old){sum(new - old)/max(length(new),1)},
+                            list(mup, sigma2p, mu_vars), last_round_params )^2)
+        if(verbose) message(paste0("Error: ", error))
+        if(error < epsilon) {
+            if(verbose) message("converged!")
+            converged <- TRUE
+        }
+        last_round_params <- list(mup, sigma2p, mu_vars)
+        iter <- iter + 1
+    }
+
+
+    colnames(last_round_params[[1]]) <- levels(experimental_design_fct)
+    colnames(last_round_params[[3]]) <- levels(experimental_design_fct)
+    rownames(last_round_params[[1]]) <- rownames(X)
+    rownames(last_round_params[[3]]) <-  rownames(X)
+
+    names(last_round_params) <- c("mup", "sigma2p", "sigma2mup")
+    last_round_params
+}
+
+
+
+
+
+
+
 #' Find the most likely variance explaining the values for each row in X
 #'
 #'

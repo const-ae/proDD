@@ -8,9 +8,6 @@ test_that("distance calculations works", {
     expect_equal(c(dist_approx(data, mu_mis=NA, var_mis=NA)$var), rep(0, 6))
 
 
-    # Method also works if no mu_mis and var_mis are provided
-    expect_equal(c(dist_approx(data)$mean), c(dist(data)))
-
 
     nrep <- 6
     mu0 <- 20
@@ -25,17 +22,24 @@ test_that("distance calculations works", {
     data <- generate_synthetic_data(n_rows=100, n_replicates=nrep, n_conditions=2,
                                     mu0=mu0, sigma20=sigma20, rho=rho, zeta=zeta,
                                     frac_changed = 0.1)
+
+    fit <- fit_hyperparameters(data$X, experimental_design)
+
+
+    mis <- find_approx_for_missing(data$X, fit$feature_params$mup, fit$feature_params$sigma2mup,
+                                   fit$feature_params$sigma2p, fit$hyper_params$rho, fit$hyper_params$zeta,
+                                   experimental_design)
+
     expect_silent({
-        res <- dist_approx(t(data$X), hyperparameters = list(
-            mu0, sigma20, mean(rho), mean(zeta)
-        ))
-        res2 <- dist_approx(t(data$X), hyperparameters = list(
-            mu0, sigma20, rho, zeta
-        ))
-        res3 <- dist_approx(t(data$X), experimental_design = experimental_design)
+        dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = rep(1, ncol(data$X)))
+        dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = experimental_design)
+        dist_approx(t(data$X), feature_params = fit$feature_params, rho=rho, zeta=zeta, experimental_design = experimental_design)
+        dist_approx(data$X, hyper_params = fit$hyper_params, experimental_design = experimental_design)
+        dist_approx(data$X, feature_params = fit$feature_params, rho=rho, zeta=zeta, experimental_design = experimental_design)
+        dist_approx(data$X, mis$mu_mis, mis$var_mis)
+        dist_approx(t(data$X), t(mis$mu_mis), t(mis$var_mis))
+        dist_approx(t(data$X), 16, 0.1)
     })
 
-
-    dist(t(data$t_X))
 
 })
