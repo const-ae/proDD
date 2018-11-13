@@ -39,3 +39,5 @@ print.prodd_parameters <- function(x, ...){
     cat(format(x, ...), "\n")
     invisible(x)
 }
+
+is.prodd_parameters <- function(x) inherits(x, "prodd_parameters")

@@ -4,8 +4,8 @@
 \alias{find_approx_for_missing}
 \title{Find a Gaussian approximation for each missing value in X}
 \usage{
-find_approx_for_missing(X, mup, mu_vars, sigma2p, rho, zeta,
-  experimental_design)
+find_approx_for_missing(X, params = NULL, experimental_design, mup,
+  sigma2mup, sigma2p, rho, zeta)
 }
 \value{
 a list with with two elements `mu_mis` and `var_mis`

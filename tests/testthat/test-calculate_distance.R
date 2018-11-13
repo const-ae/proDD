@@ -26,11 +26,11 @@ test_that("distance calculations works", {
     fit <- fit_hyperparameters(data$X, experimental_design)
 
 
-    mis <- find_approx_for_missing(data$X, fit$feature_params$mup, fit$feature_params$sigma2mup,
-                                   fit$feature_params$sigma2p, fit$hyper_params$rho, fit$hyper_params$zeta,
-                                   experimental_design)
+    mis <- find_approx_for_missing(data$X, fit, experimental_design=experimental_design)
 
     expect_silent({
+        dist_approx(t(data$X), params=fit)
+        dist_approx(t(data$X), params=fit, experimental_design = rep(1, times=ncol(data$X)))
         dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = rep(1, ncol(data$X)))
         dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = experimental_design)
         dist_approx(t(data$X), feature_params = fit$feature_params, rho=rho, zeta=zeta, experimental_design = experimental_design)

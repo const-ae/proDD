@@ -10,7 +10,11 @@
 #' be calculated instead realistic values for the missing values are considered
 #' and the mean with the corresponding variance is calculated for each distance.
 #'
-#' If no appropriate replacement values are available you can call it with
+#' If no appropriate replacement values are available you can call it with the
+#' `params` argument, which must be an object of type `prodd_parameters`. Usually
+#' the object that is returned by \code{fit_hyperparameters()} is used.
+#'
+#' Alternatively, if more flexibility is necessary you can also call the method using
 #' `feature_params` which provide the mean and variance for each feature and
 #' condition. Combined with `rho` and `zeta` they can be used to determine
 #' the replacement values. If also no `feature_params` are available, you
@@ -28,6 +32,8 @@
 #' @param var_mis variance of the replacement values. Can be a single number, a
 #'   vector with one number for each sample or a matrix with the same dimensions
 #'   as X.
+#' @param params an object of class `prodd_parameters` which is returned by the
+#'   \code{fit_hyperparameters()} function.
 #' @param feature_params a list with three elements (mup, sigma2mup and sigma2p)
 #' @param rho the dropout curve positions. Necessary if you call the function with
 #'   `feature_params`.
@@ -39,6 +45,7 @@
 #' @seealso stats::dist
 #' @export
 dist_approx <- function(X, mu_mis=NULL, var_mis=NULL,
+                        params=NULL,
                         feature_params=NULL, rho=NULL, zeta=NULL,
                         hyper_params=NULL,
                         experimental_design=NULL,
@@ -47,58 +54,84 @@ dist_approx <- function(X, mu_mis=NULL, var_mis=NULL,
 
 
     if((is.null(mu_mis) || is.null(var_mis))){
-        stopifnot(! is.null(experimental_design))
-        if(is.null(rho)){
-            rho <- hyper_params$rho
-        }
-        if(is.null(zeta)){
-            zeta <- hyper_params$zeta
-        }
-        if(! is.null(feature_params)){
-
+        if(! is.null(params)){
+            if(! is.prodd_parameters(x)){
+                stop("params must be an object of class prodd_parameters, which",
+                     " is for example returned by fit_hyperparameters()")
+            }
+            if(is.null(experimental_design)){
+                experimental_design <- params$experimental_design
+            }
             # Check if X needs to be rotated
             if(length(experimental_design) == ncol(X)){
-                mis <- find_approx_for_missing(X, feature_params$mup, feature_params$sigma2mup,
-                                               feature_params$sigma2p, rho, zeta, experimental_design)
+                mis <- find_approx_for_missing(X, params, experimental_design=experimental_design)
                 mu_mis <- mis$mu_mis
                 var_mis <- mis$var_mis
             }else if(length(experimental_design) == nrow(X)){
-                mis <- find_approx_for_missing(t(X), feature_params$mup, feature_params$sigma2mup,
-                                               feature_params$sigma2p, rho, zeta, experimental_design)
+                mis <- find_approx_for_missing(t(X), params, experimental_design=experimental_design)
                 mu_mis <- t(mis$mu_mis)
                 var_mis <- t(mis$var_mis)
             }else{
                 stop("Length of experimental_design doesn't match ncol(X) nor nrow(X)")
             }
-
-
-
-        }else if(!is.null(hyper_params)){
-            if(is.null(names(hyper_params))){
-                # Assume they are correctly ordered
-                names(hyper_params) <- c("eta", "nu", "mu0", "sigma20", "rho", "zeta")
+        }else{
+            stopifnot(! is.null(experimental_design))
+            if(is.null(rho)){
+                rho <- hyper_params$rho
             }
-            # Check if X needs to be rotated
-            if(length(experimental_design) == ncol(X)){
-                feature_params <- predict_feature_parameters(X, experimental_design, hyper_params)
-                mis <- find_approx_for_missing(X, feature_params$mup, feature_params$sigma2mup,
-                                               feature_params$sigma2p, rho, zeta, experimental_design)
-                mu_mis <- mis$mu_mis
-                var_mis <- mis$var_mis
-            }else if(length(experimental_design) == nrow(X)){
-                feature_params <- predict_feature_parameters(t(X), experimental_design, hyper_params)
-                mis <- find_approx_for_missing(t(X), feature_params$mup, feature_params$sigma2mup,
-                                               feature_params$sigma2p, rho, zeta, experimental_design)
-                mu_mis <- t(mis$mu_mis)
-                var_mis <- t(mis$var_mis)
-            }else{
-                stop("Length of experimental_design doesn't match ncol(X) nor nrow(X)")
+            if(is.null(zeta)){
+                zeta <- hyper_params$zeta
             }
+            if(! is.null(feature_params)){
+
+                # Check if X needs to be rotated
+                if(length(experimental_design) == ncol(X)){
+                    mis <- find_approx_for_missing(X, mup=feature_params$mup, sigma2mup=feature_params$sigma2mup,
+                                           sigma2p=feature_params$sigma2p, rho=rho, zeta=zeta,
+                                           experimental_design=experimental_design)
+                    mu_mis <- mis$mu_mis
+                    var_mis <- mis$var_mis
+                }else if(length(experimental_design) == nrow(X)){
+                    mis <- find_approx_for_missing(t(X), mup=feature_params$mup, sigma2mup=feature_params$sigma2mup,
+                                           sigma2p=feature_params$sigma2p, rho=rho, zeta=zeta,
+                                           experimental_design=experimental_design)
+                    mu_mis <- t(mis$mu_mis)
+                    var_mis <- t(mis$var_mis)
+                }else{
+                    stop("Length of experimental_design doesn't match ncol(X) nor nrow(X)")
+                }
 
 
-        }else {
-            stop(paste0("Either need (mu_mis and var_mis) or (feature_params and rho",
-                        " and zeta) or hyper_params"))
+
+            }else if(!is.null(hyper_params)){
+                if(is.null(names(hyper_params))){
+                    # Assume they are correctly ordered
+                    names(hyper_params) <- c("eta", "nu", "mu0", "sigma20", "rho", "zeta")
+                }
+                # Check if X needs to be rotated
+                if(length(experimental_design) == ncol(X)){
+                    feature_params <- predict_feature_parameters(X, experimental_design, hyper_params)
+                    mis <- find_approx_for_missing(X, mup=feature_params$mup, sigma2mup=feature_params$sigma2mup,
+                                           sigma2p=feature_params$sigma2p, rho=rho, zeta=zeta,
+                                           experimental_design=experimental_design)
+                    mu_mis <- mis$mu_mis
+                    var_mis <- mis$var_mis
+                }else if(length(experimental_design) == nrow(X)){
+                    feature_params <- predict_feature_parameters(t(X), experimental_design, hyper_params)
+                    mis <- find_approx_for_missing(t(X),mup=feature_params$mup, sigma2mup=feature_params$sigma2mup,
+                                           sigma2p=feature_params$sigma2p, rho=rho, zeta=zeta,
+                                           experimental_design=experimental_design)
+                    mu_mis <- t(mis$mu_mis)
+                    var_mis <- t(mis$var_mis)
+                }else{
+                    stop("Length of experimental_design doesn't match ncol(X) nor nrow(X)")
+                }
+
+
+            }else {
+                stop(paste0("Either need (mu_mis and var_mis) or (feature_params and rho",
+                            " and zeta) or hyper_params"))
+            }
         }
     }
 
@@ -182,14 +215,28 @@ distance_sq <- function(mu1, sigma1, mu2, sigma2){
 #'   both of which are matrices with the same dimensions as X
 #'   and values wherever X has a missing value.
 #'
-find_approx_for_missing <- function(X, mup, mu_vars, sigma2p,
-                                    rho, zeta, experimental_design){
+find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, sigma2mup, sigma2p,
+                                    rho, zeta){
+    if(! is.null(params)){
+        if(! is.prodd_parameters(x)){
+            stop("params must be an object of class prodd_parameters, which",
+                 " is for example returned by fit_hyperparameters()")
+        }
+        if(is.null(experimental_design)){
+            experimental_design <- params$experimental_design
+        }
+        mup <- params$feature_params$mup
+        sigma2mup <- params$feature_params$sigma2mup
+        sigma2p <- params$feature_params$sigma2p
+        rho <- params$hyper_params$rho
+        zeta <- params$hyper_params$zeta
+    }
 
     mu_mis <- proDD:::mply_dbl(seq_len(nrow(X)), ncol=ncol(X), function(idx){
         vapply(seq_len(ncol(X)), function(sample){
             if(is.na(X[idx, sample])){
                 mean_probdropout(mup[idx, experimental_design[sample]],
-                         mu_vars[idx, experimental_design[sample]] + sigma2p[idx],
+                                 sigma2mup[idx, experimental_design[sample]] + sigma2p[idx],
                          rho=rho[sample], zeta=zeta[sample])
             }else{
                 NA
@@ -201,7 +248,7 @@ find_approx_for_missing <- function(X, mup, mu_vars, sigma2p,
         vapply(seq_len(ncol(X)), function(sample){
             if(is.na(X[idx, sample])){
                 variance_probdropout(mup[idx, experimental_design[sample]],
-                         mu_vars[idx, experimental_design[sample]] + sigma2p[idx],
+                         sigma2mup[idx, experimental_design[sample]] + sigma2p[idx],
                          rho=rho[sample], zeta=zeta[sample])
             }else{
                 NA
