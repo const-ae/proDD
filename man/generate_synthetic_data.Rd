@@ -10,8 +10,8 @@ generate_synthetic_data(n_rows, experimental_design = NULL,
   n_changed = round(n_rows * min(1, frac_changed)), mu0 = 20,
   sigma20 = 10, nu = 3, eta = 0.3, rho = rep(18, times = if
   (length(n_replicates) == 1) n_replicates * n_conditions else
-  sum(n_replicates)), zeta = rep(-1, times = if (length(n_replicates) == 1)
-  n_replicates * n_conditions else sum(n_replicates)))
+  sum(n_replicates)), zeta = rep(-1, times = if (length(n_replicates) ==
+  1) n_replicates * n_conditions else sum(n_replicates)))
 }
 \arguments{
 \item{n_rows}{integer. The number of rows in the new dataset}

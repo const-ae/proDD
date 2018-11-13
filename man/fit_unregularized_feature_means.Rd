@@ -4,7 +4,8 @@
 \alias{fit_unregularized_feature_means}
 \title{Calculate the unregularized means for all rows for which mup is larger than mu0}
 \usage{
-fit_unregularized_feature_means(X, mup, mu0, zeta, rho, experimental_design)
+fit_unregularized_feature_means(X, mup, mu0, zeta, rho,
+  experimental_design)
 }
 \description{
 Calculate the unregularized means for all rows for which mup is larger than mu0

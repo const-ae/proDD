@@ -4,9 +4,10 @@
 \alias{predict_feature_parameters}
 \title{Find feature parameters for elements of X with a fixed set of hyperparameters}
 \usage{
-predict_feature_parameters(X, experimental_design, hyper_params = NULL, mu0,
-  sigma20, nu, eta, rho, zeta, mup = NULL, sigma2p = NULL,
-  sigma2mup = NULL, max_iter = 10, epsilon = 0.001, verbose = FALSE)
+predict_feature_parameters(X, experimental_design, hyper_params = NULL,
+  mu0, sigma20, nu, eta, rho, zeta, mup = NULL, sigma2p = NULL,
+  sigma2mup = NULL, max_iter = 10, epsilon = 0.001,
+  verbose = FALSE)
 }
 \arguments{
 \item{X}{data matrix}

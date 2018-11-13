@@ -26,4 +26,4 @@ LinkingTo:
     StanHeaders (>= 2.17.2)
 NeedsCompilation: yes
 SystemRequirements: GNU make
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

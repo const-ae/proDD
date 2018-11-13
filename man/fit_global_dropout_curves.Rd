@@ -13,8 +13,8 @@ fit_global_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
 fit_sample_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
   prev_rho, maxit = 5000)
 
-fit_global_scale_dropout_curves(X, mup, sigma2p, experimental_design, prev_zeta,
-  prev_rho, max_iter = 10, epsilon = 1e-05)
+fit_global_scale_dropout_curves(X, mup, sigma2p, experimental_design,
+  prev_zeta, prev_rho, max_iter = 10, epsilon = 1e-05)
 }
 \description{
 There are three different modes for fitting the inverse probit dropout

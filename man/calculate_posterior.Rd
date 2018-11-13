@@ -4,9 +4,9 @@
 \alias{calculate_posterior}
 \title{Calculate the posterior distribution of the mean for each condition}
 \usage{
-calculate_posterior(X, mu0, sigma20, nu, eta, rho, zeta, experimental_design,
-  niter = 1000, nchains = 4, ncores = nchains, batch_size = 1000,
-  verbose = TRUE)
+calculate_posterior(X, mu0, sigma20, nu, eta, rho, zeta,
+  experimental_design, niter = 1000, nchains = 4, ncores = nchains,
+  batch_size = 1000, verbose = TRUE)
 }
 \description{
 The method uses MCMC sampling to find a good approximation to the posterior
