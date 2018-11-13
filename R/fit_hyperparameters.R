@@ -163,10 +163,13 @@ fit_hyperparameters <- function(X, experimental_design,
         feature_params$sigma2mup[antisel, ] <- add_feats$sigma2mup
     }
 
-    list(hyper_params = last_round_params,
+    ret <- list(hyper_params = last_round_params,
          feature_params = feature_params,
+         experimental_design=experimental_design,
          error=error, converged=converged)
 
+    class(ret) <- "prodd_parameters"
+    ret
 }
 
 
