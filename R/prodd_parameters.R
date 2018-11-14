@@ -7,6 +7,8 @@ is_valid_prodd_parameters <- function(x, ...){
         ! is.null(x$feature_params) && ! is.null(x$experimental_design)
 }
 
+#' @rdname print.prodd_parameters
+#' @export
 format.prodd_parameters <- function(x, ...){
     stopifnot(is_valid_prodd_parameters(x))
 
@@ -35,9 +37,16 @@ format.prodd_parameters <- function(x, ...){
     paste0(c(header, exp_txt, converged_txt, error_txt, hyper_para_txt), collapse = "\n")
 }
 
+#' Collection of parameters generated when fitting the probabilistic dropout model
+#'
+#' @param x an object of calss  prodd_parameters
+#' @param ... additional arguments to be passed to or from the method
+#'
+#' @export
 print.prodd_parameters <- function(x, ...){
     cat(format(x, ...), "\n")
     invisible(x)
 }
+
 
 is.prodd_parameters <- function(x) inherits(x, "prodd_parameters")
