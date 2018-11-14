@@ -218,7 +218,7 @@ distance_sq <- function(mu1, sigma1, mu2, sigma2){
 find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, sigma2mup, sigma2p,
                                     rho, zeta){
     if(! is.null(params)){
-        if(! is.prodd_parameters(x)){
+        if(! is.prodd_parameters(params)){
             stop("params must be an object of class prodd_parameters, which",
                  " is for example returned by fit_hyperparameters()")
         }
@@ -255,6 +255,11 @@ find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, si
             }
         }, FUN.VALUE=0.0)
     })
+
+    colnames(mu_mis) <- colnames(X)
+    colnames(var_mis) <- colnames(X)
+    rownames(mu_mis) <- rownames(X)
+    rownames(var_mis) <- rownames(X)
 
     list(mu_mis=mu_mis, var_mis=var_mis)
 

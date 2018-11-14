@@ -165,7 +165,7 @@ fit_hyperparameters <- function(X, experimental_design,
 
     ret <- list(hyper_params = last_round_params,
          feature_params = feature_params,
-         experimental_design=experimental_design,
+         experimental_design=experimental_design_fct,
          error=error, converged=converged)
 
     class(ret) <- "prodd_parameters"
