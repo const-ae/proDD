@@ -9,8 +9,27 @@
 #' after burnin are \eqn{samples = niter / 2 * nchains}
 #'
 #' @export
-calculate_posterior <- function(X, mu0, sigma20, nu, eta, rho, zeta, experimental_design,
-                                niter=1000, nchains=4, ncores=nchains, batch_size=1000, verbose=TRUE){
+calculate_posterior <- function(X, params=NULL,
+                    mu0, sigma20, nu, eta, rho, zeta, experimental_design,
+                    niter=1000, nchains=4, ncores=nchains, batch_size=1000, verbose=TRUE){
+
+    if(! is.null(params)){
+        if(! is.prodd_parameters(params)){
+            stop("params must be an object of class prodd_parameters, which",
+                 " is for example returned by fit_hyperparameters()")
+        }
+        if(missing(experimental_design) || is.null(experimental_design)){
+            experimental_design <- params$experimental_design
+        }
+        mu0 <- params$hyper_params$mu0
+        sigma20 <- params$hyper_params$sigma2
+        nu <- params$hyper_params$nu
+        eta<- params$hyper_params$eta
+        rho <- params$hyper_params$rho
+        zeta <- params$hyper_params$zeta
+
+    }
+
     options(mc.cores = ncores)
 
     stopifnot(is.matrix(X))

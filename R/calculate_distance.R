@@ -222,7 +222,7 @@ find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, si
             stop("params must be an object of class prodd_parameters, which",
                  " is for example returned by fit_hyperparameters()")
         }
-        if(is.null(experimental_design)){
+        if(missing(experimental_design) || is.null(experimental_design)){
             experimental_design <- params$experimental_design
         }
         mup <- params$feature_params$mup
