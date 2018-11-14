@@ -2,12 +2,24 @@
 
 #' Calculate the posterior distribution of the mean for each condition
 #'
+#'
 #' The method uses MCMC sampling to find a good approximation to the posterior
 #' for each mean. The method is called using the parameters inferred from
 #' \code{fit_hyperparameters()}. The parameter \code{niter} specifies how many
 #' samples are drawn for each mean. The number of samples that are available
 #' after burnin are \eqn{samples = niter / 2 * nchains}
 #'
+#' @param X the data matrix
+#' @param params an object of class `prodd_parameters`
+#' @param niter the number of iteration for each posterior and chain. In
+#'   the end you will have \code{niter * nchains / 2} samples. Default: 1000
+#' @param nchains the number of chains to run in parallel. Default: 4
+#' @param batch_size Often it is faster to run the inference for multiple
+#'   features at the same time, but there is a limit after which too many features
+#'   slow down the inference. Set the number of features that are considered in
+#'   a single run. Default: 1000
+#' @param verbose boolean indicating how much output the function generates. D
+#'   Default: `TRUE`
 #' @export
 calculate_posterior <- function(X, params=NULL,
                     mu0, sigma20, nu, eta, rho, zeta, experimental_design,

@@ -4,9 +4,27 @@
 \alias{calculate_posterior}
 \title{Calculate the posterior distribution of the mean for each condition}
 \usage{
-calculate_posterior(X, mu0, sigma20, nu, eta, rho, zeta,
+calculate_posterior(X, params = NULL, mu0, sigma20, nu, eta, rho, zeta,
   experimental_design, niter = 1000, nchains = 4, ncores = nchains,
   batch_size = 1000, verbose = TRUE)
+}
+\arguments{
+\item{X}{the data matrix}
+
+\item{params}{an object of class `prodd_parameters`}
+
+\item{niter}{the number of iteration for each posterior and chain. In
+the end you will have \code{niter * nchains / 2} samples. Default: 1000}
+
+\item{nchains}{the number of chains to run in parallel. Default: 4}
+
+\item{batch_size}{Often it is faster to run the inference for multiple
+features at the same time, but there is a limit after which too many features
+slow down the inference. Set the number of features that are considered in
+a single run. Default: 1000}
+
+\item{verbose}{boolean indicating how much output the function generates. D
+Default: `TRUE`}
 }
 \description{
 The method uses MCMC sampling to find a good approximation to the posterior
