@@ -55,7 +55,7 @@ dist_approx <- function(X, mu_mis=NULL, var_mis=NULL,
 
     if((is.null(mu_mis) || is.null(var_mis))){
         if(! is.null(params)){
-            if(! is.prodd_parameters(x)){
+            if(! is.prodd_parameters(params)){
                 stop("params must be an object of class prodd_parameters, which",
                      " is for example returned by fit_hyperparameters()")
             }

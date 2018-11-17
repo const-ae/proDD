@@ -14,8 +14,8 @@ format.prodd_parameters <- function(x, ...){
 
     header <- "\tParameters of the probabilistic dropout model\n"
 
-    exp_txt <- paste0("There were ", length(experimental_design), " samples",
-                      " in ", length(unique(experimental_design)), " conditons.",
+    exp_txt <- paste0("There were ", length(x$experimental_design), " samples",
+                      " in ", length(unique(x$experimental_design)), " conditons.",
                       " In total there were ", nrow(x$feature_params$mup), " rows.")
 
     if(x$converged){
