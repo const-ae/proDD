@@ -77,7 +77,7 @@ generate_synthetic_data <- function(
 
     if(is.null(experimental_design)){
         experimental_design <- c(unlist(mapply(rep, seq_len(n_conditions), n_replicates)))
-        conditons_names <- c(LETTERS, outer(LETTERS, LETTERS, paste0))[experimental_design]
+        conditons_names <- c(LETTERS, outer(LETTERS, LETTERS, paste0))[unique(experimental_design)]
     }else{
         stopifnot(c(table(experimental_design)) == n_replicates)
         experimental_design_fct <- as.factor(experimental_design)
@@ -132,7 +132,8 @@ generate_synthetic_data <- function(
     colnames(mus) <- conditons_names[seq_len(n_conditions)]
 
     return(list(X=X, t_X=t_X, mus=mus, sigmas2=sigmas2,
-                changed=c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed))))
+                changed=c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed)),
+                experimental_design=experimental_design))
 }
 
 #' Get numeric vector with the count of the replicate for each element
