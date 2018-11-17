@@ -38,7 +38,7 @@ test_that("generating new data works", {
 
     experimental_design <- c("c1","c2","c1","c2","c1")
     d7 <- generate_synthetic_data(n_rows=100, experimental_design = experimental_design)
-    expect_equal(colnames(d7$X), experimental_design)
+    expect_equal(colnames(d7$X), c("c1-1","c2-1","c1-2","c2-2","c1-3"))
 })
 
 

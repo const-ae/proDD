@@ -127,8 +127,8 @@ generate_synthetic_data <- function(
         x
     }, FUN.VALUE = rep(0, length(experimental_design))))
 
-    colnames(X) <- conditons_names[experimental_design]
-    colnames(t_X) <- conditons_names[experimental_design]
+    colnames(X) <- paste0(conditons_names[experimental_design], "-", as_replicate(experimental_design))
+    colnames(t_X) <- paste0(conditons_names[experimental_design], "-", as_replicate(experimental_design))
     colnames(mus) <- conditons_names[seq_len(n_conditions)]
 
     return(list(X=X, t_X=t_X, mus=mus, sigmas2=sigmas2,
