@@ -40,3 +40,19 @@ test_that("generating new data works", {
     d7 <- generate_synthetic_data(n_rows=100, experimental_design = experimental_design)
     expect_equal(colnames(d7$X), experimental_design)
 })
+
+
+
+test_that("as_replicate works as expected", {
+
+    expect_equal(as_replicate(c(1, 2, 1, 2)), c(1,1,2,2))
+    expect_equal(as_replicate(c(1, 2, 2, 2, 2, 3, 1)), c(1,1,2,3,4,1,2))
+    expect_equal(as_replicate(c(1, 2, 3, 4, 2, 1, 3, 3, 4)), c(1,1,1,1,2,2,2,3,2))
+
+    x <- c("a", "b", "a", "b", "b", "d")
+    expect_equal(as_replicate(x), c(1,1,2,2,3,1))
+    x <- as.factor(c("c", "a", "b", "a", "b", "b", "B"))
+    expect_equal(as_replicate(x), c(1, 1,1,2,2,3,1))
+
+
+})

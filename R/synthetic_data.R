@@ -135,6 +135,30 @@ generate_synthetic_data <- function(
                 changed=c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed))))
 }
 
+#' Get numeric vector with the count of the replicate for each element
+#'
+#' For a vector with repeated values return a vector where each element
+#' is the count how often the element was observed previously
+#'
+#' @param x a vector with repeated elements
+#'
+#' @return numeric vector
+#'
+#'
+#' @seealso \code{\link[base]{order}}, \code{\link[base]{rank}}
+#' @examples
+#'   x <- c("a", "b", "a", "b", "b", "d")
+#'   all(as_replicate(x) == c(1,1,2,2,3,1))
+#'
+as_replicate <- function(x){
+    counter <- as.list(rep(1, times=length(unique(x))))
+    names(counter) <- unique(x)
 
-
+    replicate <- rep(NA, times=length(x))
+    for(idx in seq_along(x)){
+        replicate[idx] <- counter[[x[idx]]]
+        counter[[x[idx]]] <- counter[[x[idx]]] + 1
+    }
+    replicate
+}
 
