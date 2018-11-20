@@ -42,6 +42,7 @@ calculate_posterior <- function(X, params=NULL,
 
     }
 
+    experimental_design_fct <- as.factor(experimental_design)
     options(mc.cores = ncores)
 
     stopifnot(is.matrix(X))
@@ -51,45 +52,46 @@ calculate_posterior <- function(X, params=NULL,
     if(length(zeta) != ncol(X)){
         stop("Need one zeta for each sample")
     }
-    result <- lapply(unique(experimental_design), function(cond){
-        cond_posts <- lapply(seq_len(ceiling(nrow(X)/batch_size)), function(batch_idx){
-            .X <- X[((batch_idx-1) * batch_size+1):min(nrow(X), batch_idx*batch_size),
-                    which(experimental_design == cond), drop=FALSE]
+    batch_results <- lapply(seq_len(ceiling(nrow(X)/batch_size)), function(batch_idx){
+        .X <- X[((batch_idx-1) * batch_size+1):min(nrow(X), batch_idx*batch_size), , drop=FALSE]
 
-            # Hack to work around the lack of NA support of stan
-            .X[is.na(.X)] <- Inf
+        # Hack to work around the lack of NA support of stan
+        .X[is.na(.X)] <- Inf
 
 
-            sam_f <- function(){
-                rstan::sampling(stanmodels$batch_skewed_posterior, data=list(
-                  nsamples=ncol(.X),
-                  nrows=nrow(.X),
-                  totalmissing=sum(is.infinite(c(.X))),
+        sam_f <- function(){
+            rstan::sampling(stanmodels$batch_skewed_posterior, data=list(
+              nsamples=ncol(.X),
+              nrows=nrow(.X),
+              ncond=length(levels(experimental_design_fct)),
+              totalmissing=sum(is.infinite(c(.X))),
 
-                  X=.X,
+              X=.X,
+              experimental_design=as.numeric(experimental_design_fct),
 
-                  mu0=mu0,
-                  sigma20=sigma20,
-                  zeta=zeta[which(experimental_design == cond)],
-                  rho=rho[which(experimental_design == cond)],
-                  nu=nu,
-                  eta=eta
-                ), iter=niter, open_progress=FALSE, verbose=FALSE,
-                refresh=if(verbose)  max(niter/10, 1) else 0)
-            }
+              mu0=mu0,
+              sigma20=sigma20,
+              zeta=zeta,
+              rho=rho,
+              nu=nu,
+              eta=eta
+            ), iter=niter, open_progress=FALSE, verbose=FALSE,
+            refresh=if(verbose)  max(niter/10, 1) else 0)
+        }
 
-             if(verbose){
-                 sam <- sam_f()
-            }else{
-                sink(tempfile())
-                sam <- sam_f()
-                sink()
-            }
+         if(verbose){
+             sam <- sam_f()
+        }else{
+            sink(tempfile())
+            sam <- sam_f()
+            sink()
+        }
 
-            list(mu=rstan::extract(sam, "mu")$mu)
-        })
-        t(do.call(cbind, lapply(cond_posts, function(e) e$mu)))
+        list(mu=rstan::extract(sam, "mu")$mu)
     })
-    names(result) <- unique(experimental_design)
+    result <- lapply(seq_along(levels(experimental_design_fct)), function(cond){
+        t(do.call(cbind, lapply(batch_results, function(e) e$mu[,,cond])))
+    })
+    names(result) <- levels(experimental_design_fct)
     result
 }

@@ -1,8 +1,10 @@
 data {
   int nsamples;
   int nrows;
+  int ncond;
   int totalmissing;
   matrix[nrows, nsamples] X;
+  int experimental_design[nsamples];
 
   real zeta[nsamples];
   real rho[nsamples];
@@ -12,7 +14,7 @@ data {
   real nu;
 }
 parameters {
-  real mu[nrows];
+  matrix[nrows, ncond] mu;
   real<lower=0> sigma[nrows];
 }
 transformed parameters{
@@ -32,17 +34,20 @@ transformed parameters{
   }
 }
 model {
-  mu ~ normal(mu0, sqrt(sigma20));
+  for(c in 1:ncond){
+    mu[,c] ~ normal(mu0, sqrt(sigma20));
+  }
+
   sigma2 ~ scaled_inv_chi_square(nu, sqrt(eta));
   {
     int counter = 1;
     for(i in 1:nrows){
       for(j in 1:nsamples){
         if(is_inf(X[i, j])){
-          target += normal_lccdf(mu[i] | rho[j], fabs(zetastar[counter]));
+          target += normal_lccdf(mu[i, experimental_design[j]] | rho[j], fabs(zetastar[counter]));
           counter += 1;
         }else{
-          X[i, j] ~ normal(mu[i], sigma[i]);
+          X[i, j] ~ normal(mu[i, experimental_design[j]], sigma[i]);
         }
       }
     }
