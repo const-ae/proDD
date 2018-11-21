@@ -15,15 +15,13 @@ data {
 }
 parameters {
   matrix[nrows, ncond] mu;
-  real<lower=0> sigma[nrows];
+  real<lower=0> sigma2[nrows];
 }
 transformed parameters{
-  real sigma2[nrows];
   real zetastar[totalmissing];
   {
     int counter = 1;
     for(i in 1:nrows){
-      sigma2[i] = sigma[i]^2;
       for(j in 1:nsamples){
         if(is_inf(X[i, j])){
           zetastar[counter] = zeta[j] * sqrt(1 + sigma2[i]/zeta[j]^2);
@@ -47,7 +45,7 @@ model {
           target += normal_lccdf(mu[i, experimental_design[j]] | rho[j], fabs(zetastar[counter]));
           counter += 1;
         }else{
-          X[i, j] ~ normal(mu[i, experimental_design[j]], sigma[i]);
+          X[i, j] ~ normal(mu[i, experimental_design[j]], sqrt(sigma2[i]));
         }
       }
     }

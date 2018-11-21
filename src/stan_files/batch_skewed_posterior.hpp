@@ -36,7 +36,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_batch_skewed_posterior");
-    reader.add_event(58, 56, "end", "model_batch_skewed_posterior");
+    reader.add_event(56, 54, "end", "model_batch_skewed_posterior");
     return reader;
 }
 
@@ -215,7 +215,7 @@ public:
             validate_non_negative_index("mu", "ncond", ncond);
             num_params_r__ += nrows * ncond;
             current_statement_begin__ = 18;
-            validate_non_negative_index("sigma", "nrows", nrows);
+            validate_non_negative_index("sigma2", "nrows", nrows);
             num_params_r__ += nrows;
         } catch (const std::exception& e) {
             stan::lang::rethrow_located(e, current_statement_begin__, prog_reader__());
@@ -254,20 +254,20 @@ public:
             throw std::runtime_error(std::string("Error transforming variable mu: ") + e.what());
         }
 
-        if (!(context__.contains_r("sigma")))
-            throw std::runtime_error("variable sigma missing");
-        vals_r__ = context__.vals_r("sigma");
+        if (!(context__.contains_r("sigma2")))
+            throw std::runtime_error("variable sigma2 missing");
+        vals_r__ = context__.vals_r("sigma2");
         pos__ = 0U;
-        validate_non_negative_index("sigma", "nrows", nrows);
-        context__.validate_dims("initialization", "sigma", "double", context__.to_vec(nrows));
-        std::vector<double> sigma(nrows,double(0));
+        validate_non_negative_index("sigma2", "nrows", nrows);
+        context__.validate_dims("initialization", "sigma2", "double", context__.to_vec(nrows));
+        std::vector<double> sigma2(nrows,double(0));
         for (int i0__ = 0U; i0__ < nrows; ++i0__)
-            sigma[i0__] = vals_r__[pos__++];
+            sigma2[i0__] = vals_r__[pos__++];
         for (int i0__ = 0U; i0__ < nrows; ++i0__)
             try {
-            writer__.scalar_lb_unconstrain(0,sigma[i0__]);
+            writer__.scalar_lb_unconstrain(0,sigma2[i0__]);
         } catch (const std::exception& e) { 
-            throw std::runtime_error(std::string("Error transforming variable sigma: ") + e.what());
+            throw std::runtime_error(std::string("Error transforming variable sigma2: ") + e.what());
         }
 
         params_r__ = writer__.data_r();
@@ -310,24 +310,19 @@ public:
             else
                 mu = in__.matrix_constrain(nrows,ncond);
 
-            vector<local_scalar_t__> sigma;
-            size_t dim_sigma_0__ = nrows;
-            sigma.reserve(dim_sigma_0__);
-            for (size_t k_0__ = 0; k_0__ < dim_sigma_0__; ++k_0__) {
+            vector<local_scalar_t__> sigma2;
+            size_t dim_sigma2_0__ = nrows;
+            sigma2.reserve(dim_sigma2_0__);
+            for (size_t k_0__ = 0; k_0__ < dim_sigma2_0__; ++k_0__) {
                 if (jacobian__)
-                    sigma.push_back(in__.scalar_lb_constrain(0,lp__));
+                    sigma2.push_back(in__.scalar_lb_constrain(0,lp__));
                 else
-                    sigma.push_back(in__.scalar_lb_constrain(0));
+                    sigma2.push_back(in__.scalar_lb_constrain(0));
             }
 
 
             // transformed parameters
             current_statement_begin__ = 21;
-            validate_non_negative_index("sigma2", "nrows", nrows);
-            vector<local_scalar_t__> sigma2(nrows);
-            stan::math::initialize(sigma2, DUMMY_VAR__);
-            stan::math::fill(sigma2,DUMMY_VAR__);
-            current_statement_begin__ = 22;
             validate_non_negative_index("zetastar", "totalmissing", totalmissing);
             vector<local_scalar_t__> zetastar(totalmissing);
             stan::math::initialize(zetastar, DUMMY_VAR__);
@@ -335,7 +330,7 @@ public:
 
 
             {
-            current_statement_begin__ = 24;
+            current_statement_begin__ = 23;
             int counter(0);
             (void) counter;  // dummy to suppress unused var warning
 
@@ -343,26 +338,21 @@ public:
             stan::math::assign(counter,1);
 
 
-            current_statement_begin__ = 25;
+            current_statement_begin__ = 24;
             for (int i = 1; i <= nrows; ++i) {
 
-                current_statement_begin__ = 26;
-                stan::model::assign(sigma2, 
-                            stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                            pow(get_base1(sigma,i,"sigma",1),2), 
-                            "assigning variable sigma2");
-                current_statement_begin__ = 27;
+                current_statement_begin__ = 25;
                 for (int j = 1; j <= nsamples; ++j) {
 
-                    current_statement_begin__ = 28;
+                    current_statement_begin__ = 26;
                     if (as_bool(is_inf(get_base1(X,i,j,"X",1)))) {
 
-                        current_statement_begin__ = 29;
+                        current_statement_begin__ = 27;
                         stan::model::assign(zetastar, 
                                     stan::model::cons_list(stan::model::index_uni(counter), stan::model::nil_index_list()), 
                                     (get_base1(zeta,j,"zeta",1) * stan::math::sqrt((1 + (get_base1(sigma2,i,"sigma2",1) / pow(get_base1(zeta,j,"zeta",1),2))))), 
                                     "assigning variable zetastar");
-                        current_statement_begin__ = 30;
+                        current_statement_begin__ = 28;
                         stan::math::assign(counter, stan::model::deep_copy((counter + 1)));
                     }
                 }
@@ -370,13 +360,6 @@ public:
             }
 
             // validate transformed parameters
-            for (int i0__ = 0; i0__ < nrows; ++i0__) {
-                if (stan::math::is_uninitialized(sigma2[i0__])) {
-                    std::stringstream msg__;
-                    msg__ << "Undefined transformed parameter: sigma2" << '[' << i0__ << ']';
-                    throw std::runtime_error(msg__.str());
-                }
-            }
             for (int i0__ = 0; i0__ < totalmissing; ++i0__) {
                 if (stan::math::is_uninitialized(zetastar[i0__])) {
                     std::stringstream msg__;
@@ -388,20 +371,19 @@ public:
             const char* function__ = "validate transformed params";
             (void) function__;  // dummy to suppress unused var warning
             current_statement_begin__ = 21;
-            current_statement_begin__ = 22;
 
             // model body
 
-            current_statement_begin__ = 37;
+            current_statement_begin__ = 35;
             for (int c = 1; c <= ncond; ++c) {
 
-                current_statement_begin__ = 38;
+                current_statement_begin__ = 36;
                 lp_accum__.add(normal_log<propto__>(stan::model::rvalue(mu, stan::model::cons_list(stan::model::index_omni(), stan::model::cons_list(stan::model::index_uni(c), stan::model::nil_index_list())), "mu"), mu0, stan::math::sqrt(sigma20)));
             }
-            current_statement_begin__ = 41;
+            current_statement_begin__ = 39;
             lp_accum__.add(scaled_inv_chi_square_log<propto__>(sigma2, nu, stan::math::sqrt(eta)));
             {
-            current_statement_begin__ = 43;
+            current_statement_begin__ = 41;
             int counter(0);
             (void) counter;  // dummy to suppress unused var warning
 
@@ -409,23 +391,23 @@ public:
             stan::math::assign(counter,1);
 
 
-            current_statement_begin__ = 44;
+            current_statement_begin__ = 42;
             for (int i = 1; i <= nrows; ++i) {
 
-                current_statement_begin__ = 45;
+                current_statement_begin__ = 43;
                 for (int j = 1; j <= nsamples; ++j) {
 
-                    current_statement_begin__ = 46;
+                    current_statement_begin__ = 44;
                     if (as_bool(is_inf(get_base1(X,i,j,"X",1)))) {
 
-                        current_statement_begin__ = 47;
+                        current_statement_begin__ = 45;
                         lp_accum__.add(normal_ccdf_log(get_base1(mu,i,get_base1(experimental_design,j,"experimental_design",1),"mu",1),get_base1(rho,j,"rho",1),stan::math::fabs(get_base1(zetastar,counter,"zetastar",1))));
-                        current_statement_begin__ = 48;
+                        current_statement_begin__ = 46;
                         stan::math::assign(counter, (counter + 1));
                     } else {
 
-                        current_statement_begin__ = 50;
-                        lp_accum__.add(normal_log<propto__>(get_base1(X,i,j,"X",1), get_base1(mu,i,get_base1(experimental_design,j,"experimental_design",1),"mu",1), get_base1(sigma,i,"sigma",1)));
+                        current_statement_begin__ = 48;
+                        lp_accum__.add(normal_log<propto__>(get_base1(X,i,j,"X",1), get_base1(mu,i,get_base1(experimental_design,j,"experimental_design",1),"mu",1), stan::math::sqrt(get_base1(sigma2,i,"sigma2",1))));
                     }
                 }
             }
@@ -457,7 +439,6 @@ public:
     void get_param_names(std::vector<std::string>& names__) const {
         names__.resize(0);
         names__.push_back("mu");
-        names__.push_back("sigma");
         names__.push_back("sigma2");
         names__.push_back("zetastar");
     }
@@ -469,9 +450,6 @@ public:
         dims__.resize(0);
         dims__.push_back(nrows);
         dims__.push_back(ncond);
-        dimss__.push_back(dims__);
-        dims__.resize(0);
-        dims__.push_back(nrows);
         dimss__.push_back(dims__);
         dims__.resize(0);
         dims__.push_back(nrows);
@@ -497,10 +475,10 @@ public:
         (void) function__;  // dummy to suppress unused var warning
         // read-transform, write parameters
         matrix_d mu = in__.matrix_constrain(nrows,ncond);
-        vector<double> sigma;
-        size_t dim_sigma_0__ = nrows;
-        for (size_t k_0__ = 0; k_0__ < dim_sigma_0__; ++k_0__) {
-            sigma.push_back(in__.scalar_lb_constrain(0));
+        vector<double> sigma2;
+        size_t dim_sigma2_0__ = nrows;
+        for (size_t k_0__ = 0; k_0__ < dim_sigma2_0__; ++k_0__) {
+            sigma2.push_back(in__.scalar_lb_constrain(0));
         }
             for (int k_1__ = 0; k_1__ < ncond; ++k_1__) {
                 for (int k_0__ = 0; k_0__ < nrows; ++k_0__) {
@@ -508,7 +486,7 @@ public:
                 }
             }
             for (int k_0__ = 0; k_0__ < nrows; ++k_0__) {
-            vars__.push_back(sigma[k_0__]);
+            vars__.push_back(sigma2[k_0__]);
             }
 
         // declare and define transformed parameters
@@ -521,11 +499,6 @@ public:
 
         try {
             current_statement_begin__ = 21;
-            validate_non_negative_index("sigma2", "nrows", nrows);
-            vector<local_scalar_t__> sigma2(nrows);
-            stan::math::initialize(sigma2, DUMMY_VAR__);
-            stan::math::fill(sigma2,DUMMY_VAR__);
-            current_statement_begin__ = 22;
             validate_non_negative_index("zetastar", "totalmissing", totalmissing);
             vector<local_scalar_t__> zetastar(totalmissing);
             stan::math::initialize(zetastar, DUMMY_VAR__);
@@ -533,7 +506,7 @@ public:
 
 
             {
-            current_statement_begin__ = 24;
+            current_statement_begin__ = 23;
             int counter(0);
             (void) counter;  // dummy to suppress unused var warning
 
@@ -541,26 +514,21 @@ public:
             stan::math::assign(counter,1);
 
 
-            current_statement_begin__ = 25;
+            current_statement_begin__ = 24;
             for (int i = 1; i <= nrows; ++i) {
 
-                current_statement_begin__ = 26;
-                stan::model::assign(sigma2, 
-                            stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
-                            pow(get_base1(sigma,i,"sigma",1),2), 
-                            "assigning variable sigma2");
-                current_statement_begin__ = 27;
+                current_statement_begin__ = 25;
                 for (int j = 1; j <= nsamples; ++j) {
 
-                    current_statement_begin__ = 28;
+                    current_statement_begin__ = 26;
                     if (as_bool(is_inf(get_base1(X,i,j,"X",1)))) {
 
-                        current_statement_begin__ = 29;
+                        current_statement_begin__ = 27;
                         stan::model::assign(zetastar, 
                                     stan::model::cons_list(stan::model::index_uni(counter), stan::model::nil_index_list()), 
                                     (get_base1(zeta,j,"zeta",1) * stan::math::sqrt((1 + (get_base1(sigma2,i,"sigma2",1) / pow(get_base1(zeta,j,"zeta",1),2))))), 
                                     "assigning variable zetastar");
-                        current_statement_begin__ = 30;
+                        current_statement_begin__ = 28;
                         stan::math::assign(counter, stan::model::deep_copy((counter + 1)));
                     }
                 }
@@ -569,13 +537,9 @@ public:
 
             // validate transformed parameters
             current_statement_begin__ = 21;
-            current_statement_begin__ = 22;
 
             // write transformed parameters
             if (include_tparams__) {
-            for (int k_0__ = 0; k_0__ < nrows; ++k_0__) {
-            vars__.push_back(sigma2[k_0__]);
-            }
             for (int k_0__ = 0; k_0__ < totalmissing; ++k_0__) {
             vars__.push_back(zetastar[k_0__]);
             }
@@ -631,18 +595,13 @@ public:
         }
         for (int k_0__ = 1; k_0__ <= nrows; ++k_0__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "sigma" << '.' << k_0__;
+            param_name_stream__ << "sigma2" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
 
         if (!include_gqs__ && !include_tparams__) return;
 
         if (include_tparams__) {
-            for (int k_0__ = 1; k_0__ <= nrows; ++k_0__) {
-                param_name_stream__.str(std::string());
-                param_name_stream__ << "sigma2" << '.' << k_0__;
-                param_names__.push_back(param_name_stream__.str());
-            }
             for (int k_0__ = 1; k_0__ <= totalmissing; ++k_0__) {
                 param_name_stream__.str(std::string());
                 param_name_stream__ << "zetastar" << '.' << k_0__;
@@ -668,18 +627,13 @@ public:
         }
         for (int k_0__ = 1; k_0__ <= nrows; ++k_0__) {
             param_name_stream__.str(std::string());
-            param_name_stream__ << "sigma" << '.' << k_0__;
+            param_name_stream__ << "sigma2" << '.' << k_0__;
             param_names__.push_back(param_name_stream__.str());
         }
 
         if (!include_gqs__ && !include_tparams__) return;
 
         if (include_tparams__) {
-            for (int k_0__ = 1; k_0__ <= nrows; ++k_0__) {
-                param_name_stream__.str(std::string());
-                param_name_stream__ << "sigma2" << '.' << k_0__;
-                param_names__.push_back(param_name_stream__.str());
-            }
             for (int k_0__ = 1; k_0__ <= totalmissing; ++k_0__) {
                 param_name_stream__.str(std::string());
                 param_name_stream__ << "zetastar" << '.' << k_0__;
