@@ -76,19 +76,25 @@ generate_synthetic_data <- function(
     stopifnot(length(eta) == 1)
 
     if(is.null(experimental_design)){
-        experimental_design <- c(unlist(mapply(rep, seq_len(n_conditions), n_replicates)))
-        conditons_names <- c(LETTERS, outer(LETTERS, LETTERS, paste0))[unique(experimental_design)]
+        tmp <- c(unlist(mapply(rep, seq_len(n_conditions), n_replicates)))
+        if(length(unique(tmp)) > 702){
+            stop("Internal error: can only generate condition names for up to 702 conditions. Please ",
+                 "provide the experimental design directly.")
+        }
+        condition_names <- c(LETTERS, outer(LETTERS, LETTERS, paste0))[unique(tmp)]
+        experimental_design_fct <- factor(condition_names[tmp], levels=condition_names)
+        experimental_design <- as.numeric(experimental_design_fct)
     }else{
         stopifnot(c(table(experimental_design)) == n_replicates)
         experimental_design_fct <- as.factor(experimental_design)
-        conditons_names <- levels(experimental_design_fct)
+        condition_names <- levels(experimental_design_fct)
         experimental_design <- as.numeric(experimental_design_fct)
     }
 
     if(length(n_replicates) == 1){
         n_replicates <- rep(n_replicates, n_conditions)
     }else if(length(n_replicates) != n_conditions){
-        stop("The number of elements in n_replicates must match n_conditons")
+        stop("The number of elements in n_replicates must match n_conditions")
     }
     stopifnot(length(experimental_design) == sum(n_replicates))
     stopifnot(length(unique(experimental_design)) == n_conditions)
@@ -127,13 +133,13 @@ generate_synthetic_data <- function(
         x
     }, FUN.VALUE = rep(0, length(experimental_design))))
 
-    colnames(X) <- paste0(conditons_names[experimental_design], "-", as_replicate(experimental_design))
-    colnames(t_X) <- paste0(conditons_names[experimental_design], "-", as_replicate(experimental_design))
-    colnames(mus) <- conditons_names[seq_len(n_conditions)]
+    colnames(X) <- paste0(condition_names[experimental_design], "-", as_replicate(experimental_design))
+    colnames(t_X) <- paste0(condition_names[experimental_design], "-", as_replicate(experimental_design))
+    colnames(mus) <- condition_names[seq_len(n_conditions)]
 
     return(list(X=X, t_X=t_X, mus=mus, sigmas2=sigmas2,
                 changed=c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed)),
-                experimental_design=experimental_design))
+                experimental_design=experimental_design_fct))
 }
 
 #' Get numeric vector with the count of the replicate for each element
