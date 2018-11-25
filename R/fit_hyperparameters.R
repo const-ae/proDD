@@ -41,7 +41,9 @@ fit_hyperparameters <- function(X, experimental_design,
             mean(X[idx, which(experimental_design == cond)], na.rm=TRUE)
         }, FUN.VALUE=0.0)
     })
-    mup[is.na(mup)] <- min(mup, na.rm=TRUE)
+
+    frac_mis <- sum(is.na(X)) / prod(dim(X))
+    mup[is.na(mup)] <- quantile(mup, 0.5 * frac_mis, na.rm=TRUE, names=FALSE)
     mu0 <- mean(mup, na.rm=TRUE)
 
     # Estimate variances
@@ -137,6 +139,9 @@ fit_hyperparameters <- function(X, experimental_design,
     }
 
     names(last_round_params) <- c("eta", "nu", "mu0", "sigma20", "rho", "zeta")
+    names(last_round_params$rho) <- colnames(X)
+    names(last_round_params$zeta) <- colnames(X)
+
 
     feature_params <- list(
         mup=matrix(NA, nrow=nrow(X_bckp), ncol=N_cond),
