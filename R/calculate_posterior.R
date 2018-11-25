@@ -90,7 +90,9 @@ calculate_posterior <- function(X, params=NULL,
         list(mu=rstan::extract(sam, "mu")$mu)
     })
     result <- lapply(seq_along(levels(experimental_design_fct)), function(cond){
-        t(do.call(cbind, lapply(batch_results, function(e) e$mu[,,cond])))
+        mat <- t(do.call(cbind, lapply(batch_results, function(e) e$mu[,,cond])))
+        rownames(mat) <- rownames(X)
+        mat
     })
     names(result) <- levels(experimental_design_fct)
     result

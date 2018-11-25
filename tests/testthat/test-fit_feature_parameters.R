@@ -133,8 +133,8 @@ test_that("everything ties together", {
     expect_equal(result$hyper_params$nu, 10, tolerance=1)
     expect_equal(result$hyper_params$mu0, 20, tolerance=1)
     expect_equal(result$hyper_params$sigma20, 10, tolerance=1)
-    expect_equal(result$hyper_params$rho[1], 18, tolerance=1)
-    expect_equal(result$hyper_params$zeta[1], -1, tolerance=0.2)
+    expect_equal(as.numeric(result$hyper_params$rho[1]), 18, tolerance=1)
+    expect_equal(as.numeric(result$hyper_params$zeta[1]), -1, tolerance=0.2)
 
 })
 
