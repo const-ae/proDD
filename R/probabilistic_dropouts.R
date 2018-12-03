@@ -206,7 +206,7 @@ variance_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
             x^2 * dprobdropout(x, mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)
         }, lower=-Inf, upper=Inf)$value
 
-        mom2 - mean_probdropout(mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)^2
+        mom2 - mean_probdropout(mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta, approx=FALSE)^2
     }
 
 }
