@@ -232,7 +232,7 @@ match_probdropout_skewed_normal <- function(mu, sigma2, rho, zeta){
     # 5 Point matching
     points <-  c(0,1,-1,0.5,-0.5)
     f <- dprobdropout(mode + points * sqrt(variance), mu, sigma2, rho=rho, zeta=zeta)
-    res <- optim(par=c(location=mode, omega=1, alpha=1), function(par){
+    res <- optim(par=c(location=mode, omega=1, alpha=-1), function(par){
         location <- par[1]
         omega <- par[2]
         alpha <- par[3]
