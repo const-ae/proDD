@@ -155,7 +155,7 @@ generate_synthetic_data <- function(
 #' @seealso \code{\link[base]{order}}, \code{\link[base]{rank}}
 #' @examples
 #'   x <- c("a", "b", "a", "b", "b", "d")
-#'   all(as_replicate(x) == c(1,1,2,2,3,1))
+#'   all(proDD:::as_replicate(x) == c(1,1,2,2,3,1))
 #'
 as_replicate <- function(x){
     counter <- as.list(rep(1, times=length(unique(x))))

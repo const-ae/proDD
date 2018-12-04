@@ -1,14 +1,20 @@
 Package: proDD
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Differentially detection of proteins in label-free mass spectrometry data
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Authors@R: c(person("Constantin", "Ahlmann-Eltze", email = "artjom31415@googlemail.com", role = c("aut", "cre")),
+             person("Simon", "Anders", email="s.anders@zmbh.uni-heidelberg.de", role="ths"))
+Description: The package implements a Bayesian model to handle label-free
+    mass spectrometry data. The model takes into account the missing observations
+    which occur at low intensity using a probabilistic dropout model. It can
+    be used to infer which proteins differ between conditons and provides
+    additional methods to estimate the dropout probability curves, the sample
+    distances and other useful functions.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.0.2)
 Suggests: 
     testthat
 Imports: 
@@ -17,7 +23,8 @@ Imports:
     extraDistr,
     Rcpp,
     rstan (>= 2.17.3),
-    rstantools (>= 1.5.1)
+    rstantools (>= 1.5.1),
+    methods
 LinkingTo: 
     BH (>= 1.66.0-1),
     Rcpp (>= 0.12.18),

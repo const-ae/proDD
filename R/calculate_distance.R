@@ -232,7 +232,7 @@ find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, si
         zeta <- params$hyper_params$zeta
     }
 
-    mu_mis <- proDD:::mply_dbl(seq_len(nrow(X)), ncol=ncol(X), function(idx){
+    mu_mis <- mply_dbl(seq_len(nrow(X)), ncol=ncol(X), function(idx){
         vapply(seq_len(ncol(X)), function(sample){
             if(is.na(X[idx, sample])){
                 mean_probdropout(mup[idx, experimental_design[sample]],
@@ -244,7 +244,7 @@ find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, si
         }, FUN.VALUE=0.0)
     })
 
-    var_mis <- proDD:::mply_dbl(seq_len(nrow(X)), ncol=ncol(X), function(idx){
+    var_mis <- mply_dbl(seq_len(nrow(X)), ncol=ncol(X), function(idx){
         vapply(seq_len(ncol(X)), function(sample){
             if(is.na(X[idx, sample])){
                 variance_probdropout(mup[idx, experimental_design[sample]],
