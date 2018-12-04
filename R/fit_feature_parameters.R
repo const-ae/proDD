@@ -340,39 +340,3 @@ fit_unregularized_feature_means <- function(X, mup, mu0, zeta, rho, experimental
 
 
 
-#' Fit a Gaussian location prior over all samples
-#'
-#' The function takes the regularized feature means. The global mu0 is the
-#' mean of the regularized feature means. It then calculates the unregularized
-#' feature means right of the global mean (so that missing values are less
-#' problematic). The global variance estimate is the variance of those
-#' unregularized values to the global mean.
-#'
-#' @return list with elements mu0 and sigma20
-#'
-fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
-    mu0 <- mean(mup, na.rm=TRUE)
-    mu_unreg <- fit_unregularized_feature_means(X, mup, mu0, zeta, rho, experimental_design)
-    sigma20 <- sum((mu_unreg[! is.na(mu_unreg)] - mu0)^2/sum(! is.na(mu_unreg)))
-    list(mu0=mu0, sigma20=sigma20)
-}
-
-
-#' Fit a inverse Chi-squared variance prior
-#'
-#' Run maximum likelihood estimate on the density of the F distribution with
-#' the unregularized variance estimates.
-#'
-fit_variance_prior <- function(X, rho, zeta, experimental_design){
-    DF_eff <- calc_df_eff(X, experimental_design)
-    sigma2_unreg <- fit_unregularized_feature_variances(X, rho, zeta, experimental_design)
-
-    var_est <- optim(par=c(eta=1, nu=1), function(par){
-        if(par[1] < 0 || par[2] < 0 ) return(Inf)
-        - sum(sapply(seq_len(nrow(X))[DF_eff >= 1 & ! is.na(sigma2_unreg)], function(idx){
-            df(sigma2_unreg[idx]/par[1], df1=DF_eff[idx], df2=par[2], log=TRUE) - log(par[1])
-        }))
-    })
-    names(var_est$par) <- NULL
-    list(var_prior=var_est$par[1], df_prior=var_est$par[2])
-}

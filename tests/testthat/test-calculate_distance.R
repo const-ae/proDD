@@ -23,7 +23,7 @@ test_that("distance calculations works", {
                                     mu0=mu0, sigma20=sigma20, rho=rho, zeta=zeta,
                                     frac_changed = 0.1)
 
-    fit <- fit_hyperparameters(data$X, experimental_design)
+    fit <- fit_parameters(data$X, experimental_design, dropout_curve_calc = "global")
 
 
     mis <- find_approx_for_missing(data$X, fit, experimental_design=experimental_design)

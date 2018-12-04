@@ -7,17 +7,47 @@
 
 
 
-
-
-#' Iteratively update the hyperparameter until convergence
+#' Fit the probabilistic dropout parameters
 #'
+#' The method infers the position and scale of the dropout sigmoids, the
+#' location prior of the means and the prior for the variance. In addition it
+#' estimates some feature parameters (mean, uncertainty of mean and variance
+#' for each protein and condition).
 #'
-fit_hyperparameters <- function(X, experimental_design,
-                                dropout_curve_calc=c("global", "global_scale", "sample"),
+#' @param X the numerical data where each column is one sample and each row
+#'   is one protein. Missing values are coded as \code{NA}.
+#' @param experimental_design a vector that assignes each sample to one condition.
+#'   It has the same length as the number of columns in \code{X}. It can either be
+#'   a factor, a character or a numeric vector. Each unique element is one condition.
+#' @param dropout_curve_calc string that specifies how the dropout curves are
+#'   estimated. There are three different modes. "sample": number of curves=
+#'   number of samples, "global": number of curves=1, "global_scale": estimate
+#'   only a single scale of the sigmoid, but estimate the position per sample.
+#'   Default: "sample".
+#' @param frac_subsample number between 0 and 1. Often it is not necessary to
+#'   consider each protein, but the computation can be significantly sped up
+#'   by only considering a subset of the subsets. Default: 1.0.
+#' @param n_subsample number between 1 and \code{nrow(X)}. Alternative way to
+#'   specify how many proteins are considered for estimating the hyper-parameters.
+#'   Default: \code{nrow(X) * frac_subsample}.
+#' @param max_iter integer larger than 1. How many iterations are run at most
+#'   trying to reach convergence. Default: 10.
+#' @param epsilon number larger than 0. How big is the maximum remaining error
+#'   for the algorithm to be considered converged. Default: 10^-3
+#' @param verbose boolean. Specify how much extra information is printed
+#'   while the algorithm is running. Default: \code{FALSE}.
+#'
+#' @return a list containing the infered parameters. The list is tagged
+#'   with the class "prodd_parameters" for simpler handling in downstream
+#'   methods
+#'
+#' @export
+fit_parameters <- function(X, experimental_design,
+                                dropout_curve_calc=c("sample", "global_scale", "global"),
                                 frac_subsample=1.0, n_subsample=round(nrow(X) * frac_subsample),
                                 max_iter=10, epsilon=1e-3, verbose=FALSE){
 
-    dropout_curve_calc <- match.arg(dropout_curve_calc, c("global", "global_scale", "sample"))
+    dropout_curve_calc <- match.arg(dropout_curve_calc, c("sample", "global_scale", "global"))
 
     experimental_design_fct <- as.factor(experimental_design)
     experimental_design <- as.numeric(experimental_design_fct)
@@ -179,3 +209,39 @@ fit_hyperparameters <- function(X, experimental_design,
 
 
 
+#' Fit a Gaussian location prior over all samples
+#'
+#' The function takes the regularized feature means. The global mu0 is the
+#' mean of the regularized feature means. It then calculates the unregularized
+#' feature means right of the global mean (so that missing values are less
+#' problematic). The global variance estimate is the variance of those
+#' unregularized values to the global mean.
+#'
+#' @return list with elements mu0 and sigma20
+#'
+fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
+    mu0 <- mean(mup, na.rm=TRUE)
+    mu_unreg <- fit_unregularized_feature_means(X, mup, mu0, zeta, rho, experimental_design)
+    sigma20 <- sum((mu_unreg[! is.na(mu_unreg)] - mu0)^2/sum(! is.na(mu_unreg)))
+    list(mu0=mu0, sigma20=sigma20)
+}
+
+
+#' Fit a inverse Chi-squared variance prior
+#'
+#' Run maximum likelihood estimate on the density of the F distribution with
+#' the unregularized variance estimates.
+#'
+fit_variance_prior <- function(X, rho, zeta, experimental_design){
+    DF_eff <- calc_df_eff(X, experimental_design)
+    sigma2_unreg <- fit_unregularized_feature_variances(X, rho, zeta, experimental_design)
+
+    var_est <- optim(par=c(eta=1, nu=1), function(par){
+        if(par[1] < 0 || par[2] < 0 ) return(Inf)
+        - sum(sapply(seq_len(nrow(X))[DF_eff >= 1 & ! is.na(sigma2_unreg)], function(idx){
+            df(sigma2_unreg[idx]/par[1], df1=DF_eff[idx], df2=par[2], log=TRUE) - log(par[1])
+        }))
+    })
+    names(var_est$par) <- NULL
+    list(var_prior=var_est$par[1], df_prior=var_est$par[2])
+}

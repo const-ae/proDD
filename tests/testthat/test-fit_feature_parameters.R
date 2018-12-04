@@ -126,7 +126,7 @@ test_that("everything ties together", {
     data <- generate_synthetic_data(n_rows = 100, n_replicates = N_rep, n_conditions = 2,
                                     rho=rep(18, N_rep*2), zeta=rep(-1, N_rep*2),
                                     nu=10, eta=0.3, mu0=20, sigma20=10)
-    result <- fit_hyperparameters(data$X, experimental_design=rep(1:2, each=N_rep),
+    result <- fit_parameters(data$X, experimental_design=rep(1:2, each=N_rep),
                                   dropout_curve_calc = "global", verbose=FALSE)
 
     expect_equal(result$hyper_params$eta, 0.3, tolerance=0.1)
@@ -144,7 +144,7 @@ test_that("predicting features for new data works", {
     data <- generate_synthetic_data(n_rows = 200, experimental_design,
                                     rho=18, zeta=-1.2,
                                     nu=10, eta=0.3, mu0=20, sigma20=10)
-    result <- fit_hyperparameters(data$X, experimental_design, frac_subsample = 1,
+    result <- fit_parameters(data$X, experimental_design, frac_subsample = 1,
                                   dropout_curve_calc = "global", verbose=TRUE)
 
 

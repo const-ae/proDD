@@ -12,7 +12,7 @@
 #'
 #' If no appropriate replacement values are available you can call it with the
 #' `params` argument, which must be an object of type `prodd_parameters`. Usually
-#' the object that is returned by \code{fit_hyperparameters()} is used.
+#' the object that is returned by \code{fit_parameters()} is used.
 #'
 #' Alternatively, if more flexibility is necessary you can also call the method using
 #' `feature_params` which provide the mean and variance for each feature and
@@ -33,7 +33,7 @@
 #'   vector with one number for each sample or a matrix with the same dimensions
 #'   as X.
 #' @param params an object of class `prodd_parameters` which is returned by the
-#'   \code{fit_hyperparameters()} function.
+#'   \code{fit_parameters()} function.
 #' @param feature_params a list with three elements (mup, sigma2mup and sigma2p)
 #' @param rho the dropout curve positions. Necessary if you call the function with
 #'   `feature_params`.
@@ -57,7 +57,7 @@ dist_approx <- function(X, mu_mis=NULL, var_mis=NULL,
         if(! is.null(params)){
             if(! is.prodd_parameters(params)){
                 stop("params must be an object of class prodd_parameters, which",
-                     " is for example returned by fit_hyperparameters()")
+                     " is for example returned by fit_parameters()")
             }
             if(is.null(experimental_design)){
                 experimental_design <- params$experimental_design
@@ -220,7 +220,7 @@ find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, si
     if(! is.null(params)){
         if(! is.prodd_parameters(params)){
             stop("params must be an object of class prodd_parameters, which",
-                 " is for example returned by fit_hyperparameters()")
+                 " is for example returned by fit_parameters()")
         }
         if(missing(experimental_design) || is.null(experimental_design)){
             experimental_design <- params$experimental_design

@@ -27,7 +27,7 @@ test_that("printing looks beautiful", {
                                     mu0=mu0, sigma20=sigma20, rho=rho, zeta=zeta,
                                     frac_changed = 0.1)
 
-    fit <- fit_hyperparameters(data$X, experimental_design)
+    fit <- fit_parameters(data$X, experimental_design)
     fit
     expect_equal(class(format(fit)), "character")
 })

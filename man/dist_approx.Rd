@@ -20,7 +20,7 @@ vector with one number for each sample or a matrix with the same dimensions
 as X.}
 
 \item{params}{an object of class `prodd_parameters` which is returned by the
-\code{fit_hyperparameters()} function.}
+\code{fit_parameters()} function.}
 
 \item{feature_params}{a list with three elements (mup, sigma2mup and sigma2p)}
 
@@ -44,7 +44,7 @@ and the mean with the corresponding variance is calculated for each distance.
 \details{
 If no appropriate replacement values are available you can call it with the
 `params` argument, which must be an object of type `prodd_parameters`. Usually
-the object that is returned by \code{fit_hyperparameters()} is used.
+the object that is returned by \code{fit_parameters()} is used.
 
 Alternatively, if more flexibility is necessary you can also call the method using
 `feature_params` which provide the mean and variance for each feature and

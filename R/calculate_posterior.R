@@ -5,7 +5,7 @@
 #'
 #' The method uses MCMC sampling to find a good approximation to the posterior
 #' for each mean. The method is called using the parameters inferred from
-#' \code{fit_hyperparameters()}. The parameter \code{niter} specifies how many
+#' \code{fit_parameters()}. The parameter \code{niter} specifies how many
 #' samples are drawn for each mean. The number of samples that are available
 #' after burnin are \eqn{samples = niter / 2 * nchains}
 #'
@@ -28,7 +28,7 @@ calculate_posterior <- function(X, params=NULL,
     if(! is.null(params)){
         if(! is.prodd_parameters(params)){
             stop("params must be an object of class prodd_parameters, which",
-                 " is for example returned by fit_hyperparameters()")
+                 " is for example returned by fit_parameters()")
         }
         if(missing(experimental_design) || is.null(experimental_design)){
             experimental_design <- params$experimental_design

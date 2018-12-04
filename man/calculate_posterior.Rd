@@ -29,7 +29,7 @@ Default: `TRUE`}
 \description{
 The method uses MCMC sampling to find a good approximation to the posterior
 for each mean. The method is called using the parameters inferred from
-\code{fit_hyperparameters()}. The parameter \code{niter} specifies how many
+\code{fit_parameters()}. The parameter \code{niter} specifies how many
 samples are drawn for each mean. The number of samples that are available
 after burnin are \eqn{samples = niter / 2 * nchains}
 }
