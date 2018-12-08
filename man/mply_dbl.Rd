@@ -15,6 +15,8 @@ msply_dbl(x, FUN, ...)
 \item{FUN}{the function that returns a vector of length ncol}
 
 \item{ncol}{the length of the vector returned by `FUN`.}
+
+\item{...}{additional arguments to FUN}
 }
 \value{
 a matrix of size \code{length(x) x ncol}

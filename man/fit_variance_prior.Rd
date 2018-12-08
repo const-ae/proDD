@@ -10,3 +10,4 @@ fit_variance_prior(X, rho, zeta, experimental_design)
 Run maximum likelihood estimate on the density of the F distribution with
 the unregularized variance estimates.
 }
+\keyword{internal}

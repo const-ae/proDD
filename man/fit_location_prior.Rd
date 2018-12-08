@@ -16,3 +16,4 @@ feature means right of the global mean (so that missing values are less
 problematic). The global variance estimate is the variance of those
 unregularized values to the global mean.
 }
+\keyword{internal}

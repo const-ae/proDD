@@ -36,7 +36,7 @@
 #'     \item{sigma2mup}{a matrix with size \code{nrow(X) * unique(experimental_design)}
 #'       with the uncertainty for each `mup`}
 #'   }
-#'
+#' @keywords internal
 predict_feature_parameters <- function(X, experimental_design, hyper_params=NULL,
                                        mu0, sigma20, nu, eta, rho, zeta,
                                        mup=NULL, sigma2p=NULL, sigma2mup=NULL,
@@ -129,7 +129,7 @@ predict_feature_parameters <- function(X, experimental_design, hyper_params=NULL
 
 #' Find the most likely variance explaining the values for each row in X
 #'
-#'
+#' @keywords internal
 fit_feature_variances <- function(X, mup, rho, zeta, nu, eta, experimental_design,
                                   upper=1e3){
     N_cond <- length(unique(experimental_design))
@@ -159,7 +159,7 @@ fit_feature_variances <- function(X, mup, rho, zeta, nu, eta, experimental_desig
 
 
 #' Calculate the variance of the mean estimator
-#'
+#' @keywords internal
 fit_feature_mean_uncertainties <- function(X, rho, zeta, nu, eta, mu0, sigma20,
                                            experimental_design){
     N_cond <- length(unique(experimental_design))
@@ -195,7 +195,7 @@ fit_feature_mean_uncertainties <- function(X, rho, zeta, nu, eta, mu0, sigma20,
 
 #' Estimate the mean for each feature
 #'
-#'
+#' @keywords internal
 fit_feature_means <- function(X, sigma2p, sigma2mus, rho, zeta, nu, eta,
                               mu0, sigma20, experimental_design){
     N_cond <- length(unique(experimental_design))
@@ -230,7 +230,7 @@ fit_feature_means <- function(X, sigma2p, sigma2mus, rho, zeta, nu, eta,
 #'
 #' The effective degrees of freedom are the sum of all non NA observation
 #' minus the number of non-empty conditions.
-#'
+#' @keywords internal
 calc_df_eff <- function(X, experimental_design){
     N_cond <- length(unique(experimental_design))
     vapply(seq_len(nrow(X)), function(idx){
@@ -251,6 +251,7 @@ calc_df_eff <- function(X, experimental_design){
 #' those because the prior estimation needs to be unbiased from former rounds
 #'
 #' The methods returns \code{NA} for each feature with less than 2 observations.
+#' @keywords internal
 fit_unregularized_feature_variances <- function(X, rho, zeta,
                                                 experimental_design,
                                                 upper=1000){
@@ -313,7 +314,7 @@ fit_unregularized_feature_variances <- function(X, rho, zeta,
 
 #' Calculate the unregularized means for all rows for which mup is larger than mu0
 #'
-#'
+#' @keywords internal
 fit_unregularized_feature_means <- function(X, mup, mu0, zeta, rho, experimental_design){
     N_cond <- length(unique(experimental_design))
     mply_dbl(seq_len(nrow(X)), ncol=N_cond, function(idx){

@@ -10,3 +10,4 @@ fit_unregularized_feature_means(X, mup, mu0, zeta, rho,
 \description{
 Calculate the unregularized means for all rows for which mup is larger than mu0
 }
+\keyword{internal}

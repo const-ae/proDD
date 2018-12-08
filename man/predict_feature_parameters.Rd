@@ -60,3 +60,4 @@ list with three elements
 \description{
 Find feature parameters for elements of X with a fixed set of hyperparameters
 }
+\keyword{internal}

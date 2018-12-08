@@ -10,3 +10,4 @@ fit_feature_means(X, sigma2p, sigma2mus, rho, zeta, nu, eta, mu0, sigma20,
 \description{
 Estimate the mean for each feature
 }
+\keyword{internal}

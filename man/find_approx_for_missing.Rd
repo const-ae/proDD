@@ -15,3 +15,4 @@ a list with with two elements `mu_mis` and `var_mis`
 \description{
 Find a Gaussian approximation for each missing value in X
 }
+\keyword{internal}

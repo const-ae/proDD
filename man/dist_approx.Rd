@@ -59,5 +59,5 @@ the distances are calculated between the samples, to calculate the distances
 between the proteins set \code{by_sample=FALSE}.
 }
 \seealso{
-\code{\link{stats::dist}}
+\code{\link[stats]{dist}}
 }

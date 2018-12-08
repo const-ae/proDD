@@ -10,3 +10,4 @@ fit_feature_variances(X, mup, rho, zeta, nu, eta, experimental_design,
 \description{
 Find the most likely variance explaining the values for each row in X
 }
+\keyword{internal}

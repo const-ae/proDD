@@ -15,3 +15,4 @@ those because the prior estimation needs to be unbiased from former rounds
 \details{
 The methods returns \code{NA} for each feature with less than 2 observations.
 }
+\keyword{internal}

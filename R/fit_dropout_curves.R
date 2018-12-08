@@ -14,7 +14,7 @@
 #' \item{fit_global_scale_dropout_curves}{One curve for each sample,
 #'   but all have a common scale (zeta)}
 #' }
-#'
+#' @keywords internal
 fit_global_dropout_curves <- function(X, mup, sigma2p, experimental_design,
                                       prev_zeta, prev_rho, maxit=5000){
 

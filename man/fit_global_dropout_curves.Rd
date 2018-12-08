@@ -26,3 +26,4 @@ curves:
   but all have a common scale (zeta)}
 }
 }
+\keyword{internal}

@@ -10,3 +10,4 @@ fit_feature_mean_uncertainties(X, rho, zeta, nu, eta, mu0, sigma20,
 \description{
 Calculate the variance of the mean estimator
 }
+\keyword{internal}

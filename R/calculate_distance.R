@@ -42,7 +42,7 @@
 #' @param var_mis variance of the replacement values. Can be a single number, a
 #'   vector with one number for each sample or a matrix with the same dimensions
 #'   as X. Can be provided instead of the `params` parameters.
-#' @seealso \code{\link{stats::dist}}
+#' @seealso \code{\link[stats]{dist}}
 #'
 #' @return a list with two elements:
 #'   \describe{
@@ -139,7 +139,7 @@ dist_approx <- function(X, params=NULL, by_sample=TRUE,
 #' @return a list with elements `mean` and `var`
 #'
 #' 1. Mathai, A. & Provost, S. Quadratic Forms in Random Variables. (1992).
-#'
+#' @keywords internal
 distance_sq <- function(mu1, sigma1, mu2, sigma2){
     mu <- mu2 - mu1
     sigma <- sigma1 + sigma2
@@ -156,6 +156,7 @@ distance_sq <- function(mu1, sigma1, mu2, sigma2){
 #'   both of which are matrices with the same dimensions as X
 #'   and values wherever X has a missing value.
 #'
+#' @keywords internal
 find_approx_for_missing <- function(X, params=NULL, experimental_design, mup, sigma2mup, sigma2p,
                                     rho, zeta){
     if(! is.null(params)){

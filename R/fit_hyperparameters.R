@@ -218,7 +218,7 @@ fit_parameters <- function(X, experimental_design,
 #' unregularized values to the global mean.
 #'
 #' @return list with elements mu0 and sigma20
-#'
+#' @keywords internal
 fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
     mu0 <- mean(mup, na.rm=TRUE)
     mu_unreg <- fit_unregularized_feature_means(X, mup, mu0, zeta, rho, experimental_design)
@@ -231,7 +231,7 @@ fit_location_prior <- function(X, mup, zeta, rho, experimental_design){
 #'
 #' Run maximum likelihood estimate on the density of the F distribution with
 #' the unregularized variance estimates.
-#'
+#' @keywords internal
 fit_variance_prior <- function(X, rho, zeta, experimental_design){
     DF_eff <- calc_df_eff(X, experimental_design)
     sigma2_unreg <- fit_unregularized_feature_variances(X, rho, zeta, experimental_design)

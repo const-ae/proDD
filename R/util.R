@@ -24,6 +24,7 @@ NULL
 #' @param x a vector that will be passed to `vapply`
 #' @param FUN the function that returns a vector of length ncol
 #' @param ncol the length of the vector returned by `FUN`.
+#' @param ... additional arguments to FUN
 #'
 #' @return a matrix of size \code{length(x) x ncol}
 mply_dbl <- function(x, FUN, ncol=1, ...){

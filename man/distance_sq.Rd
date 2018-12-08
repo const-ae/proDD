@@ -16,3 +16,4 @@ The function takes the mean and the diagonal of the covariance matrix
 as vector and calculates the mean and variance of their distance distribution.
 The formulas are based on [1] page 53.
 }
+\keyword{internal}

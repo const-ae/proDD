@@ -10,3 +10,4 @@ calc_df_eff(X, experimental_design)
 The effective degrees of freedom are the sum of all non NA observation
 minus the number of non-empty conditions.
 }
+\keyword{internal}
