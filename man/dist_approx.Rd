@@ -26,7 +26,7 @@ vector with one number for each sample or a matrix with the same dimensions
 as X. Can be provided instead of the `params` parameters.}
 }
 \value{
-a list with two elements.
+a list with two elements:
   \describe{
     \item{mean}{a distance matrix with the mean of the distance estimate}
     \item{var}{the corresponding uncertainty to each distance estimate}

@@ -36,5 +36,17 @@ test_that("posterior calculation works", {
         resampling_test(posterior2$`1`[idx, ], posterior2$`2`[idx, ])
     })
 
-    expect_lt(suppressWarnings(ks.test(pval2, "punif")$p.value), 0.05)
+    expect_lt(
+        suppressWarnings(ks.test(pval2, "punif")$p.value), 0.05)
+
+    experimental_design <- rep(c("A", "B"), each=3)
+    data3 <- generate_synthetic_data(n_rows=100, experimental_design)
+    params <- fit_parameters(data3$X, experimental_design)
+    expect_silent({
+        posterior3 <- sample_protein_means(data3$X, params, verbose=FALSE, control=list(adapt_delta=0.95),
+                                           niter=100)
+    })
+
+
+
 })
