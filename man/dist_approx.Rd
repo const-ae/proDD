@@ -2,61 +2,62 @@
 % Please edit documentation in R/calculate_distance.R
 \name{dist_approx}
 \alias{dist_approx}
-\title{Distance matrix computation respecting nonrandom missing values}
+\title{Distance matrix computation respecting non-random missing values}
 \usage{
-dist_approx(X, mu_mis = NULL, var_mis = NULL, params = NULL,
-  feature_params = NULL, rho = NULL, zeta = NULL,
-  hyper_params = NULL, experimental_design = NULL, ...)
+dist_approx(X, params = NULL, by_sample = TRUE, mu_mis = NULL,
+  var_mis = NULL)
 }
 \arguments{
-\item{X}{the data matrix}
+\item{X}{the numerical data where each column is one sample and each row
+is one protein. Missing values are coded as \code{NA}.}
+
+\item{params}{an object of class `prodd_parameters` which for example is returned
+by the \code{fit_parameters()} function.}
+
+\item{by_sample}{boolean. Indicate if the distances between samples (columns) or
+proteins (rows) is calculated. Default: TRUE.}
 
 \item{mu_mis}{mean of the replacement values. Can be a single number, a
 vector with one number for each sample or a matrix with the same dimensions
-as X.}
+as X. Can be provided instead of the `params` parameters.}
 
 \item{var_mis}{variance of the replacement values. Can be a single number, a
 vector with one number for each sample or a matrix with the same dimensions
-as X.}
-
-\item{params}{an object of class `prodd_parameters` which is returned by the
-\code{fit_parameters()} function.}
-
-\item{feature_params}{a list with three elements (mup, sigma2mup and sigma2p)}
-
-\item{rho}{the dropout curve positions. Necessary if you call the function with
-`feature_params`.}
-
-\item{zeta}{the dropout curve width Necessary if you call the function with
-`feature_params`.}
-
-\item{hyper_params}{a list with four elements (mu0, sigma20, rho and zeta),
-that are used to calculate a good replacement value.}
-
-\item{experimental_design}{assignment to which condition each sample belongs.}
+as X. Can be provided instead of the `params` parameters.}
+}
+\value{
+a list with two elements.
+  \describe{
+    \item{mean}{a distance matrix with the mean of the distance estimate}
+    \item{var}{the corresponding uncertainty to each distance estimate}
+  }
 }
 \description{
-The method calculates the distances between each row of the matrix X and
-returns a distance matrix. Because of the missing values no exact distance can
-be calculated instead realistic values for the missing values are considered
-and the mean with the corresponding variance is calculated for each distance.
+The method calculates the distances between each samples or proteins of the matrix X and
+returns a distance matrix and the corresponding uncertainty. Because of the missing
+values no exact distance can be calculated instead realistic values for the missing
+values are considered and the mean with the corresponding variance is
+calculated for each distance.
 }
 \details{
-If no appropriate replacement values are available you can call it with the
-`params` argument, which must be an object of type `prodd_parameters`. Usually
-the object that is returned by \code{fit_parameters()} is used.
+Usually the method is called with the data matrix `X `and
+the object that is returned by \code{fit_parameters()} or the result
+obtained by first calling \code{transform_parameters()} to remove the group
+information. The `params` object must be  of type `prodd_parameters`.
 
-Alternatively, if more flexibility is necessary you can also call the method using
-`feature_params` which provide the mean and variance for each feature and
-condition. Combined with `rho` and `zeta` they can be used to determine
-the replacement values. If also no `feature_params` are available, you
-can also just call the function with `hyper_params` and all of the above
-values are calculated. In both cases it is necessary to provide the
-`experimental_design` parameter so there is a clear mapping between
-sample and condition. In case mu_mis and var_mis are inferred, the
-\code{length(experimental_design)} is used to determine if `X` needs to be
-transposed before inferring the parameters.
+If particular information are available, where the missing values would have
+been (ie. mean and variance for each missing value), they can instead of the
+params object be provided in form of two matrices (with the same dimensions as X)
+or individual values.
+
+Unlike the \code{stats::dist} function which always calculates the distance
+between the rows of the matrix and one transposes X to find the distances
+between columns, this method uses the \code{by_sample} parameter. In `X` (and
+correspondingly for `mu_mis` and `var_mis`)
+the columns always correspond to the samples and the rows to the proteins. By default
+the distances are calculated between the samples, to calculate the distances
+between the proteins set \code{by_sample=FALSE}.
 }
 \seealso{
-stats::dist
+\code{\link{stats::dist}}
 }

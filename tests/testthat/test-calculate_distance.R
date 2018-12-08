@@ -4,8 +4,8 @@ test_that("distance calculations works", {
 
     data <- matrix(rnorm(1000), nrow=4, ncol=250)
     # Without missing data dist_approx behaves the same as dist
-    expect_equal(c(dist_approx(data, mu_mis=NA, var_mis=NA)$mean), c(dist(data)))
-    expect_equal(c(dist_approx(data, mu_mis=NA, var_mis=NA)$var), rep(0, 6))
+    expect_equal(c(dist_approx(data, mu_mis=NA, var_mis=NA, by_sample=FALSE)$mean), c(dist(data)))
+    expect_equal(c(dist_approx(data, mu_mis=NA, var_mis=NA, by_sample=FALSE)$var), rep(0, 6))
 
 
 
@@ -23,23 +23,29 @@ test_that("distance calculations works", {
                                     mu0=mu0, sigma20=sigma20, rho=rho, zeta=zeta,
                                     frac_changed = 0.1)
 
-    fit <- fit_parameters(data$X, experimental_design, dropout_curve_calc = "global")
+    fit <- fit_parameters(data$X, experimental_design, dropout_curve_calc = "global", max_iter = 2)
 
 
     mis <- find_approx_for_missing(data$X, fit, experimental_design=experimental_design)
 
-    expect_silent({
-        dist_approx(t(data$X), params=fit)
-        dist_approx(t(data$X), params=fit, experimental_design = rep(1, times=ncol(data$X)))
-        dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = rep(1, ncol(data$X)))
-        dist_approx(t(data$X), hyper_params = fit$hyper_params, experimental_design = experimental_design)
-        dist_approx(t(data$X), feature_params = fit$feature_params, rho=rho, zeta=zeta, experimental_design = experimental_design)
-        dist_approx(data$X, hyper_params = fit$hyper_params, experimental_design = experimental_design)
-        dist_approx(data$X, feature_params = fit$feature_params, rho=rho, zeta=zeta, experimental_design = experimental_design)
-        dist_approx(data$X, mis$mu_mis, mis$var_mis)
-        dist_approx(t(data$X), t(mis$mu_mis), t(mis$var_mis))
-        dist_approx(t(data$X), 16, 0.1)
-    })
+    dmat <- dist_approx(data$X, params=fit)$mean
+    expect_equal(nrow(as.matrix(dmat)), 12)
+
+    dmat2 <- dist_approx(data$X, params=fit, by_sample = FALSE)$mean
+    expect_equal(nrow(as.matrix(dmat2)), 100)
+
+    dmat3 <- dist_approx(data$X, mu_mis=mis$mu_mis, var_mis=mis$var_mis)$mean
+    expect_equal(dmat, dmat3)
+
+    dmat4 <- dist_approx(data$X, mu_mis=mis$mu_mis, var_mis=mis$var_mis, by_sample=FALSE)$mean
+    dmat5 <- dist_approx(t(data$X), mu_mis=t(mis$mu_mis), var_mis=t(mis$var_mis))$mean
+
+    expect_equal(dmat4, dmat2)
+    expect_equal(dmat4, dmat5)
+
+    expect_silent(dist_approx(data$X, mu_mis=16, var_mis=0.1))
+
+    expect_error(dist_approx(t(data$X), fit))
 
 
 })
