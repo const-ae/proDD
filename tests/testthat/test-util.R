@@ -25,4 +25,21 @@ test_that("msply_dbl can handle simple inputs", {
 test_that("mply_dbl handles types correctly", {
     expect_equal(mply_dbl(TRUE, function(x) c(x, x*2), ncol=2), matrix(1:2, nrow=1))
     expect_error(mply_dbl("asd", function(x) c(x, x), ncol=2))
+    expect_error(msply_dbl("asd", function(x) c(x, x)))
+    expect_equal(msply_dbl(TRUE, function(x) c(x, x)), matrix(c(1,1), nrow=1))
+})
+
+
+test_that("mply_dbl handles matrix input", {
+
+    mat <- matrix(1:10, nrow=5)
+
+    expect_equal(mply_dbl(mat, sum, ncol=1), matrix(rowSums(mat), ncol=1))
+    expect_equal(mply_dbl(mat, function(x) c(x[1]+x[2], x[1]*x[2]), ncol=2),
+                 matrix(c(mat[,1] + mat[,2], mat[,1] * mat[,2]), ncol=2))
+
+    expect_equal(msply_dbl(mat, function(x) c(x[1]+x[2], x[1]*x[2])),
+                 matrix(c(mat[,1] + mat[,2], mat[,1] * mat[,2]), ncol=2))
+
+
 })

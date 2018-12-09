@@ -10,7 +10,8 @@ mply_dbl(x, FUN, ncol = 1, ...)
 msply_dbl(x, FUN, ...)
 }
 \arguments{
-\item{x}{a vector that will be passed to `vapply`}
+\item{x}{a vector that will be passed to `vapply` or a matrix that will be
+passed to apply with \code{MARGIN=1}.}
 
 \item{FUN}{the function that returns a vector of length ncol}
 
