@@ -4,22 +4,25 @@
 \alias{resampling_test}
 \title{Test the difference between x and y using resampling.}
 \usage{
-resampling_test(x, y, nmax = length(x) * length(y),
-  alternative = c("two.sided", "less", "greater"), mu = 0)
+resampling_test(x, y, alternative = c("two.sided", "less", "greater"),
+  mu = 0, nmax = length(x) * length(y))
 }
 \arguments{
 \item{x}{first numeric vector}
 
 \item{y}{second numeric vector}
 
-\item{nmax}{the maximum number of comparisons. Can be used if the full
-precision is not needed. Defaults to making all possible comparisons}
-
 \item{alternative}{how are x and y compared. Same principles as
 \code{t.test}}
 
 \item{mu}{test if there is at least distance mu between x and y.
 Equivalent to calling \code{resampling_test(x, y + mu)}}
+
+\item{nmax}{the maximum number of comparisons. Can be used if the full
+precision is not needed. Defaults to making all possible comparisons}
+}
+\value{
+the p-value, ie. the fraction of elements in x that are smaller than y.
 }
 \description{
 The method is an alternative to \code{mean(outer(x, y, `<`))}
