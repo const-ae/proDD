@@ -33,6 +33,12 @@ mply_dbl <- function(x, FUN, ncol=1, ...){
         res <- vapply(x, FUN, FUN.VALUE=rep(0.0, times=ncol), ...)
     }else{
         res <- apply(x, 1, FUN, ...) * 1.0
+        if(nrow(x) > 0 && length(res) == 0){
+            # Empty result, make matrix
+            res <- matrix(numeric(0),nrow=0, ncol=nrow(x))
+        }else if(nrow(x) == 0){
+            res <- matrix(numeric(0), nrow=ncol, ncol=0)
+        }
         if((ncol == 1 && ! is.vector(res)) || (ncol > 1 && nrow(res) != ncol)){
             stop(paste0("values must be length ", ncol,
                        ", but result is length ", nrow(res)))
@@ -50,9 +56,29 @@ mply_dbl <- function(x, FUN, ncol=1, ...){
 #'   of columns
 msply_dbl <- function(x, FUN, ...){
     if(is.vector(x)){
-        res <- sapply(x, FUN, ...) * 1.0
+        res <- sapply(x, FUN, ...)
     }else{
-        res <- apply(x, 1, FUN, ...) * 1.0
+        res <- apply(x, 1, FUN, ...)
+    }
+
+    if(is.list(res)){
+        if(all(vapply(res, function(x) is.numeric(x) && length(x) == 0, FUN.VALUE = FALSE))){
+            res <- matrix(numeric(0),nrow=0, ncol=length(res))
+        }else{
+            stop("Couldn't simplify result to a matrix")
+        }
+    }
+    if(is.matrix(x) && length(res) == 0){
+        # Empty result, make matrix
+        res <- matrix(numeric(0),nrow=0, ncol=nrow(x))
+    }
+
+    if(is.numeric(res)){
+        # Do nothing
+    }else if(is.logical(res)){
+        res <- res * 1.0
+    }else{
+        stop(paste0("Result is of type ", typeof(res), ". Cannot convert to numeric."))
     }
 
     if(is.matrix(res)){

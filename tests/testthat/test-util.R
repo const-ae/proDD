@@ -43,3 +43,38 @@ test_that("mply_dbl handles matrix input", {
 
 
 })
+
+test_that("mply_dbl can handle ncol=0", {
+
+    input <- 1:10
+    res <- mply_dbl(input, function(x) {numeric(0)}, ncol=0)
+    expect_equal(dim(res), c(10, 0))
+    res <- msply_dbl(input, function(x) {numeric(0)})
+    expect_equal(dim(res), c(10, 0))
+
+    mat <- matrix(1:10, nrow=5)
+
+
+    expect_equal(dim(msply_dbl(input, function(x) numeric(0))), c(10, 0))
+    expect_equal(dim(msply_dbl(mat, function(x) numeric(0))), c(5, 0))
+
+    expect_equal(dim(mply_dbl(input, function(x) numeric(0), ncol=0)), c(10, 0))
+    expect_equal(dim(mply_dbl(mat, function(x) numeric(0), ncol=0)), c(5, 0))
+
+})
+
+
+test_that("mply_dbl can handle empty inputs", {
+
+    input <- numeric(0)
+
+    expect_equal(dim(mply_dbl(input, function(x) x, ncol=3)), c(0, 3))
+    expect_equal(dim(msply_dbl(input, function(x) x)), c(0, 0))
+
+    mat <- matrix(numeric(0), nrow=0, ncol=5)
+
+    expect_equal(dim(mply_dbl(mat, function(x) x, ncol=2)), c(0, 2))
+    expect_equal(dim(msply_dbl(mat, function(x) x)), c(0, 0))
+
+})
+
