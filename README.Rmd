@@ -9,7 +9,9 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.align = "center",
+  out.width = "80%",
+  dpi = 170
 )
 ```
 
@@ -61,7 +63,8 @@ set.seed(1)
 
 Next we will load some data. To make our life easier we will use
 synthetic data, where we know which proteins have changed and which have not.
-For this we will use the `generate_synthetic_data()` function.
+For this we will use the `generate_synthetic_data()`. We define that 10\% of the
+protein differ between condtion A and B.
 
 ```{r}
 
@@ -70,7 +73,8 @@ experimental_design <- c("A", "A", "A", "B", "B", "B")
 
 # The generate_synthetic_data can be customized a lot, but here we will 
 # use it in its most basic form
-syn_data <- generate_synthetic_data(n_rows=1234, experimental_design=experimental_design)
+syn_data <- generate_synthetic_data(n_rows=1234, experimental_design=experimental_design,
+                                    frac_changed = 0.1)
 
 # The data matrix, where non-observed values are coded as NA
 X <- syn_data$X
@@ -91,7 +95,9 @@ so we will for this plot just replace all missing values with a zero
 X_for_plotting <- X
 X_for_plotting[is.na(X_for_plotting)] <- 0
 pheatmap(X_for_plotting,
-         main=paste0(round(sum(is.na(X))/prod(dim(X)) * 100), "% missing values"))
+         main=paste0(round(sum(is.na(X))/prod(dim(X)) * 100), "% missing values"),
+         annotation_row = data.frame(changed=syn_data$changed * 1.0, row.names = rownames(X_for_plotting)),
+         show_rownames = FALSE)
 ```
 
 
@@ -99,8 +105,7 @@ One important observation is that the missing values do not occur randomly,
 but predominantly at low intensities. This can be most clearly be seen, when 
 looking at proteins which have some observed and some missing values
 
-```{r}
-
+```{r, fig.width=6, fig.height=2.8}
 hist_tmp_data <- data.frame(intensity=c(X), 
            row_has_missing=c(t(apply(X, 1, function(x) rep(any(is.na(x)), ncol(X))))))
 
@@ -116,7 +121,7 @@ that the values dropout, whereas for high intensities (e.g. `>25`) almost
 no value is missing. We capture this idea using a sigmoidal shaped dropout
 curve that looks roughly like this:
 
-```{r}
+```{r, fig.width=6, fig.height=2.8}
 dropout_curve <- data.frame(intensity=seq(12, 32, length.out=1001))
 dropout_curve$dropout_probability <- invprobit(dropout_curve$intensity, rho=18, zeta=-2.5)
 
@@ -155,11 +160,13 @@ using `dist(t(X))`. But `dist` simply scales up vectors containing missing value
 which is equivalent to some kind of mean imputation, which does not really
 make sense as we have seen when we looked where missing values actually occur.
 
-```{r}
+```{r, fig.width=4.8, fig.height=4.8, out.width="50%"}
 naive_dist <- dist(t(X))
-pheatmap(naive_dist, cluster_rows=FALSE, cluster_cols = FALSE,
+pheatmap(as.matrix(naive_dist), cluster_rows=FALSE, cluster_cols = FALSE,
          color=viridisLite::plasma(n=100, direction=-1),
-         breaks = seq(30, 60, length.out=101))
+         breaks = seq(30, 60, length.out=101),
+         display_numbers=round(as.matrix(naive_dist)),
+         number_color = "black")
 ```
 
 
@@ -176,17 +183,16 @@ But usually this is exactly what we want to check in the first place. Instead we
 parameter object and act as if every sample belonged to the same condition.
 
 
-```{r}
+```{r, fig.width=4.8, fig.height=4.8, out.width="50%"}
 # Removing condtion information to get unbiased results
-dist_proDD2 <- dist_approx(X, transform_parameters(params, rep(1, times=ncol(X))))
-# The mean of the sample distance estimates
-pheatmap(dist_proDD2$mean, cluster_rows=FALSE, cluster_cols=FALSE,
+dist_proDD <- dist_approx(X, transform_parameters(params, rep(1, times=ncol(X))))
+# The mean and standard deviation of the sample distance estimates
+pheatmap(as.matrix(dist_proDD$mean), cluster_rows=FALSE, cluster_cols=FALSE,
          color=viridisLite::plasma(n=100, direction=-1),
-         breaks = seq(30, 60, length.out=101))
-
-# The standard error of the distance estimates
-# In this case the uncertainty is for all distances very small
-pheatmap(sqrt(dist_proDD2$var), cluster_rows=FALSE, cluster_cols=FALSE)
+         breaks = seq(30, 60, length.out=101),
+         display_numbers=matrix(paste0(round(as.matrix(dist_proDD$mean)), " ± ",
+                              round(sqrt(as.matrix(dist_proDD$var)), 1)), nrow=6),
+         number_color = "black")
 ```
 
 
@@ -228,14 +234,17 @@ were actually changed
 result$changed <- syn_data$changed
 
 ggplot(result, aes(x=diff, y=-log10(pval), color=changed)) +
-    geom_point()
+    geom_point() +
+    ggtitle("Volcano plot highlighting truely changed values")
 ```
 
 We know that 10% of the data was changed and in the volcano plot we can see that
-our method does a good job of identifying many of them
+our method does a good job of identifying many of them.
 
-An interesting experiment is to look for both conditions how many values were
-actually observed and separate the data by this information
+An interesting way to look at at the data is to explicitly look how many values 
+were observed per condition. So we will make 16 plots, where we compare the 
+difference between for A and B if we had three 3 vs. 3, 3 vs. 2, 3 vs. 1 etc. 
+observed values.
 
 ```{r}
 result$nobs_a <- rowSums(! is.na(X[, experimental_design == "A"]))
@@ -243,7 +252,7 @@ result$nobs_b <- rowSums(! is.na(X[, experimental_design == "B"]))
 
 ggplot(result, aes(x=diff, y=-log10(pval), color=changed)) +
     geom_point() +
-    facet_grid(nobs_a ~ nobs_b)
+    facet_grid(nobs_a ~ nobs_b, labeller = label_both)
 ```
 
 
@@ -256,7 +265,13 @@ by the number of observations
 result$label <- paste0(pmax(result$nobs_a, result$nobs_b), "-", pmin(result$nobs_a, result$nobs_b))
 
 ggplot(result, aes(x=mean, y=diff, color=label, shape=changed)) +
-    geom_point(size=2)
+    geom_point(size=2) +
+    ggtitle("MA plot comparing the number of observed values")
+
+ggplot(result, aes(x=mean, y=diff, color=adj_pval < 0.05)) +
+    geom_point(size=2) +
+    ggtitle("MA plot identifying significant and non-significant values")
+
 ```
 
 
