@@ -133,12 +133,22 @@ generate_synthetic_data <- function(
         x
     }, FUN.VALUE = rep(0, length(experimental_design))))
 
+    changed <- c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed))
+
     colnames(X) <- paste0(condition_names[experimental_design], "-", as_replicate(experimental_design))
     colnames(t_X) <- paste0(condition_names[experimental_design], "-", as_replicate(experimental_design))
     colnames(mus) <- condition_names[seq_len(n_conditions)]
 
+
+    prot_names <- if(nrow(X) == 0) character(0) else paste0("protein_", seq_len(nrow(X)))
+    rownames(X) <- prot_names
+    rownames(t_X) <- prot_names
+    rownames(mus) <- prot_names
+    sigmas2 <- prot_names
+    names(changed) <- prot_names
+
     return(list(X=X, t_X=t_X, mus=mus, sigmas2=sigmas2,
-                changed=c(rep(FALSE, n_rows-n_changed), rep(TRUE, n_changed)),
+                changed=changed,
                 experimental_design=experimental_design_fct))
 }
 
