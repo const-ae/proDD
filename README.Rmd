@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 Differential Detection for Label-free (LFQ) Mass Spectometry Data
 
-The tool fits a probabilistic ropout model to an intensity matrix from from label-free quantification (LFQ). Dropouts in 
+The tool fits a probabilistic dropout model to an intensity matrix from from label-free quantification (LFQ). Dropouts in 
 LFQ data occur if the protein has a low intensity. Our model takes the non-random missingness into account, by constructing 
 a Bayesian hierarchical model. After fitting the model you can sample from the posterior distribution of the means from each
 protein and condition. The posterior are a useful element to calculate all kind of statistics/metrics including the probability
@@ -28,7 +28,7 @@ that the intensity of a protein in one condition is smaller than in the control 
 Install the latest version directly from GitHub (make sure that `devtools` is installed)
 
 ```{r eval=FALSE, include=TRUE}
-devtools::install("const-ae/proDD")
+devtools::install_github("const-ae/proDD")
 ```
 
 # Disclaimer
@@ -60,7 +60,7 @@ set.seed(1)
 
 
 Next we will load some data. To make our life easier we will use
-synthetic data, where we know which protein have changed and which have not.
+synthetic data, where we know which proteins have changed and which have not.
 For this we will use the `generate_synthetic_data()` function.
 
 ```{r}
@@ -129,8 +129,8 @@ ggplot(hist_tmp_data, aes(x=intensity)) +
 
 
 Our probabilistic dropout algorithm has two major steps. In the first step
-we infer important hyper-parameters of the model using an EM algotrithm. The
-hyoer-parameters that we identify are
+we infer important hyper-parameters of the model using an EM algorithm. The
+hyper-parameters that we identify are
 
 * the location and scale of the dropout curve for each sample (called `rho` and `zeta`)
 * the overal location of the values (`mu0` and `sigma20`)
@@ -146,7 +146,7 @@ As we can see the method has successfully converged so we can continue. If
 it would not have converged increase `max_iter`. Also we are currently working
 on a moderately sized data set, usually a thousand proteins are enough to 
 make good estimates of the hyper-parameters, if your dataset has many proteins
-you can easily speed up the inferrence by setting for example `n_subsample=1000`.
+you can easily speed up the inference by setting for example `n_subsample=1000`.
 
 
 Knowing the general distribution of our data, we might be interested how the 
@@ -166,7 +166,7 @@ pheatmap(naive_dist, cluster_rows=FALSE, cluster_cols = FALSE,
 
 Instead our package provides a function called `dist_approx` that estimates the
 distances and properly takes into account the missing values. But due to the missing
-values we cannot not be certain of the exact distance. Thus the function returns 
+values we cannot be certain of the exact distance. Thus the function returns 
 in addition to the best guess of the distance an estimate how variable that 
 guess is. 
 
