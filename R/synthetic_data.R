@@ -144,7 +144,7 @@ generate_synthetic_data <- function(
     rownames(X) <- prot_names
     rownames(t_X) <- prot_names
     rownames(mus) <- prot_names
-    sigmas2 <- prot_names
+    names(sigmas2) <- prot_names
     names(changed) <- prot_names
 
     return(list(X=X, t_X=t_X, mus=mus, sigmas2=sigmas2,

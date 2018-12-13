@@ -67,7 +67,7 @@ test_that("unregularized variance estimates work", {
                                         experimental_design=rep(1, N_rep))
 
     nobs <- rowSums(! is.na(data$X))
-    expect_equal(which(is.na(sigma2_unreg)), which(nobs <= 1))
+    expect_equal(which(is.na(sigma2_unreg)), as.numeric(which(nobs <= 1)))
 
     sigma2p <- fit_feature_variances(data$X, data$mus, rho=rep(18, N_rep), zeta=rep(-1, N_rep),
                                      nu=10, eta=0.3, experimental_design = rep(1, N_rep))
