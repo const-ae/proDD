@@ -4,8 +4,8 @@
 \alias{dist_approx}
 \title{Distance matrix computation respecting non-random missing values}
 \usage{
-dist_approx(X, params = NULL, by_sample = TRUE, mu_mis = NULL,
-  var_mis = NULL)
+dist_approx(X, params = NULL, by_sample = TRUE, blind = TRUE,
+  mu_mis = NULL, var_mis = NULL)
 }
 \arguments{
 \item{X}{the numerical data where each column is one sample and each row
@@ -16,6 +16,16 @@ by the \code{fit_parameters()} function.}
 
 \item{by_sample}{boolean. Indicate if the distances between samples (columns) or
 proteins (rows) is calculated. Default: TRUE.}
+
+\item{blind}{boolean. If one provides the params argument infered by the
+\code{find_parameters()} function, the feature parameters contain information
+about the condition of each sample. This can be undesirable if one wants to
+infer unsupervised sample similarities for quality control. This is the most
+common use case for the \code{dist_approx()} function. Thus the function by default
+removes condition information to give unbiased distance estimates by internally
+transforming the params object using
+\code{transform_parameters(params, rep(1, length(params$experimental_design)))}.
+Default: TRUE.}
 
 \item{mu_mis}{mean of the replacement values. Can be a single number, a
 vector with one number for each sample or a matrix with the same dimensions

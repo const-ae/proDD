@@ -26,7 +26,8 @@ test_that("distance calculations works", {
     fit <- fit_parameters(data$X, experimental_design, dropout_curve_calc = "global", max_iter = 2)
 
 
-    mis <- find_approx_for_missing(data$X, fit, experimental_design=experimental_design)
+    mis <- find_approx_for_missing(data$X, transform_parameters(fit, rep(1, length(experimental_design))),
+                                   experimental_design=rep(1, length(experimental_design)))
 
     dmat <- dist_approx(data$X, params=fit)$mean
     expect_equal(nrow(as.matrix(dmat)), 12)

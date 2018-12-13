@@ -36,6 +36,15 @@
 #'    by the \code{fit_parameters()} function.
 #' @param by_sample boolean. Indicate if the distances between samples (columns) or
 #'   proteins (rows) is calculated. Default: TRUE.
+#' @param blind boolean. If one provides the params argument infered by the
+#'   \code{find_parameters()} function, the feature parameters contain information
+#'   about the condition of each sample. This can be undesirable if one wants to
+#'   infer unsupervised sample similarities for quality control. This is the most
+#'   common use case for the \code{dist_approx()} function. Thus the function by default
+#'   removes condition information to give unbiased distance estimates by internally
+#'   transforming the params object using
+#'   \code{transform_parameters(params, rep(1, length(params$experimental_design)))}.
+#'   Default: TRUE.
 #' @param mu_mis mean of the replacement values. Can be a single number, a
 #'   vector with one number for each sample or a matrix with the same dimensions
 #'   as X. Can be provided instead of the `params` parameters.
@@ -51,7 +60,7 @@
 #'   }
 #'
 #' @export
-dist_approx <- function(X, params=NULL, by_sample=TRUE,
+dist_approx <- function(X, params=NULL, by_sample=TRUE, blind=TRUE,
                         mu_mis=NULL, var_mis=NULL){
 
 
@@ -60,7 +69,9 @@ dist_approx <- function(X, params=NULL, by_sample=TRUE,
             stop("params must be an object of class prodd_parameters, which",
                  " is for example returned by fit_parameters()")
         }else{
-
+            if(blind){
+                params <- transform_parameters(params, rep(1, length(params$experimental_design)))
+            }
 
             # Find approximation for the missing values
             mis <- find_approx_for_missing(X, params)
