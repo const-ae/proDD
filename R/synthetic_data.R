@@ -126,9 +126,7 @@ generate_synthetic_data <- function(
 
     X <- t(vapply(seq_len(n_rows), function(idx){
         x <- t_X[idx, ]
-        dropout_prob <-  vapply(seq_along(x), function(j){
-            invprobit(x[j], rho[j], zeta[j])
-        }, FUN.VALUE = 0.0)
+        dropout_prob <-  invprobit(x, rho, zeta)
         x[runif(length(x)) < dropout_prob] <- NA
         x
     }, FUN.VALUE = rep(0, length(experimental_design))))
