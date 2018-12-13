@@ -73,7 +73,8 @@ X_for_plotting <- X
 X_for_plotting[is.na(X_for_plotting)] <- 0
 pheatmap(X_for_plotting,
          main=paste0(round(sum(is.na(X))/prod(dim(X)) * 100), "% missing values"),
-         annotation_row = data.frame(changed=syn_data$changed * 1.0, row.names = rownames(X_for_plotting)),
+         annotation_row = data.frame(changed=as.factor(syn_data$changed),
+                                     row.names = rownames(X_for_plotting)),
          show_rownames = FALSE)
 ```
 
@@ -137,7 +138,7 @@ params
 #> zeta:     -1.05, -1.11, -1.04, -1.04, -0.916, -1.06
 ```
 
-As we can see the method has successfully converged so we can continue. If it would not have converged increase `max_iter`. Also we are currently working on a moderately sized data set, usually a thousand proteins are enough to make good estimates of the hyper-parameters, if your dataset has many proteins you can easily speed up the inference by setting for example `n_subsample=1000`.
+As we can see the method has successfully converged so we can continue. If it would not have converged increase `max_iter`. In this example we are working on a moderately sized data set, usually a thousand proteins are enough to make good estimates of the hyper-parameters, if your dataset has many proteins you can easily speed up the inference by setting for example `n_subsample=1000`.
 
 Knowing the general distribution of our data, we might be interested how the samples are related. Naively we would just calculate the distance matrix using `dist(t(X))`. But `dist` simply scales up vectors containing missing values, which is equivalent to some kind of mean imputation, which does not really make sense as we have seen when we looked where missing values actually occur.
 
@@ -154,11 +155,9 @@ pheatmap(as.matrix(naive_dist), cluster_rows=FALSE, cluster_cols = FALSE,
 
 Instead our package provides a function called `dist_approx` that estimates the distances and properly takes into account the missing values. But due to the missing values we cannot be certain of the exact distance. Thus the function returns in addition to the best guess of the distance an estimate how variable that guess is.
 
-If we were to call `dist_approx` directly with the `params` object this could bias our result, because the missing values would be inferred using the group structure. But usually this is exactly what we want to check in the first place. Instead we transform the parameter object and act as if every sample belonged to the same condition.
-
 ``` r
 # Removing condtion information to get unbiased results
-dist_proDD <- dist_approx(X, transform_parameters(params, rep(1, times=ncol(X))))
+dist_proDD <- dist_approx(X, params, by_sample=TRUE, blind=TRUE)
 # The mean and standard deviation of the sample distance estimates
 pheatmap(as.matrix(dist_proDD$mean), cluster_rows=FALSE, cluster_cols=FALSE,
          color=viridisLite::plasma(n=100, direction=-1),
