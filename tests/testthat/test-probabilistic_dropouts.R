@@ -118,6 +118,17 @@ test_that("mean_probdropout works", {
                  mean_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3, approx=FALSE),
                  tolerance=0.05)
 
+    # Compare against analytical mean of Skewed Normal
+    mu <- 1
+    sigma2 <- 3
+    rho <- -1
+    zeta <- 2
+    sn_res <- mean_probdropout(mu, sigma2, rho, zeta)
+    num_res <- integrate(function(x){
+        x * dprobdropout(x, mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)
+    }, lower=-Inf, upper=Inf)$value + mu
+
+    expect_equal(sn_res, num_res, tolerance=0.05)
 })
 
 
@@ -141,6 +152,17 @@ test_that("variance_probdropout works", {
                  variance_probdropout(mu=0, sigma2=3, rho=-2, zeta=-0.3, approx=FALSE),
                  tolerance=0.2)
 
+    # Compare against analytical variance of Skewed Normal
+    mu <- 1
+    sigma2 <- 3
+    rho <- -1
+    zeta <- 2
+    sn_res <- variance_probdropout(mu, sigma2, rho, zeta)
+    mom2 <- integrate(function(x){
+        x^2 * dprobdropout(x, mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta)
+    }, lower=-Inf, upper=Inf)$value
+    num_res <- mom2 - mean_probdropout(mu=0, sigma2=sigma2, rho=rho-mu, zeta=zeta, approx=FALSE)^2
+    expect_equal(sn_res, num_res, tolerance=0.05)
 })
 
 

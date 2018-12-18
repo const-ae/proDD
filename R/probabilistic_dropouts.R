@@ -152,6 +152,12 @@ mean_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
     if(nmis == 0){
         # Easy way out
         return(mu)
+    }else if(nmis == 1){
+        # Still easy way out (mean skew normal)
+        alpha <- sqrt(sigma2) / zeta
+        tau <- sign(zeta) * (mu - rho) / sqrt(sigma2 + zeta^2)
+        ret <- mu + dnorm(tau) /  pnorm(tau) * sqrt(sigma2) * alpha / sqrt(1 + alpha^2)
+        return(ret)
     }
 
     if(approx){
@@ -191,6 +197,13 @@ variance_probdropout <- function(mu, sigma2, rho, zeta, log=FALSE, approx=TRUE){
     if(nmis == 0){
         # Easy way out
         return(sigma2)
+    }else if(nmis == 1){
+        # Still easy way out (var skew normal)
+        alpha <- sqrt(sigma2) / zeta
+        tau <- sign(zeta) * (mu - rho) / sqrt(sigma2 + zeta^2)
+        ret <- sigma2 * (1 + alpha^2/(1 + alpha^2) *
+                    (-dnorm(tau)^2 / pnorm(tau)^2 - tau * dnorm(tau) / pnorm(tau)))
+        return(ret)
     }
 
     if(approx){
