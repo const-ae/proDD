@@ -207,7 +207,7 @@ fit_feature_means <- function(X, sigma2p, sigma2mus, rho, zeta, nu, eta,
             nobs <- sum(! is.na(x))
             if(nobs == 0){
                 sigma2 <- sigma2p[idx]
-                sigma2mu <- sigma2mus[idx, cond]
+                sigma2mu <- sigma20
                 mu <- mu0
             }else if(nobs == 1){
                 sigma2 <- sigma2p[idx]
