@@ -19,8 +19,7 @@ devtools::install_github("const-ae/proDD")
 Disclaimer
 ==========
 
-I am still actively working on the project and although the algorithm is working fine at this point, the API
-might still be subject to change.
+I am still actively working on the project and although the algorithm is working fine at this point, the API might still be subject to change.
 
 Walkthrough
 ===========
@@ -55,15 +54,18 @@ syn_data <- generate_synthetic_data(n_rows=1234, experimental_design=experimenta
 # The data matrix, where non-observed values are coded as NA
 X <- syn_data$X
 
+# Median normalization to remove sample effects 
+X <- median_normalization(X)
+
 # The columns are the samples and each row is a protein
 head(X)
 #>                A-1      A-2      A-3      B-1      B-2      B-3
-#> protein_1 26.01637 26.19815 24.34241 25.16535 26.44820 25.78622
-#> protein_2 21.32026 21.03830 20.82801 22.09844 21.64022 21.11569
-#> protein_3 22.07577 21.82087 22.03724 21.88494 22.54764 22.00424
-#> protein_4 27.27920 26.88433 27.16552 26.33441 27.62639 26.83863
-#> protein_5 17.94647 17.67842 17.69316 17.73461 17.95657       NA
-#> protein_6 24.16161 24.13973 24.81110 24.96692 24.84591 23.41231
+#> protein_1 26.01094 26.19299 24.33803 25.16535 26.44060 25.78596
+#> protein_2 21.31483 21.03314 20.82363 22.09844 21.63262 21.11544
+#> protein_3 22.07034 21.81571 22.03286 21.88494 22.54004 22.00399
+#> protein_4 27.27377 26.87917 27.16113 26.33441 27.61880 26.83838
+#> protein_5 17.94104 17.67325 17.68878 17.73461 17.94897       NA
+#> protein_6 24.15618 24.13457 24.80671 24.96692 24.83832 23.41206
 ```
 
 To get a better impression of the raw data we will make a heatmap plot (using the `pheatmap` package). Unfortunately the `hclust` method that is internally used does not support missing values, so we will for this plot just replace all missing values with a zero
@@ -73,7 +75,7 @@ X_for_plotting <- X
 X_for_plotting[is.na(X_for_plotting)] <- 0
 pheatmap(X_for_plotting,
          main=paste0(round(sum(is.na(X))/prod(dim(X)) * 100), "% missing values"),
-         annotation_row = data.frame(changed=as.factor(syn_data$changed),
+         annotation_row = data.frame(changed=as.character(syn_data$changed),
                                      row.names = rownames(X_for_plotting)),
          show_rownames = FALSE)
 ```
@@ -127,15 +129,15 @@ params
 #> 
 #> There were 6 samples in 2 conditons. In total there were 1234 rows.
 #> The model has successfully converged.
-#> The error of the last iteration was 0.0003331
+#> The error of the last iteration was 0.0001249
 #> 
 #> The inferred parameters are:
 #> eta:      0.302
 #> nu:       3.09
-#> mu0:      20.5
-#> sigma20:  7.88
-#> rho:      18.4, 18.4, 18.3, 18.4, 18.4, 18.4
-#> zeta:     -1.05, -1.11, -1.04, -1.04, -0.916, -1.06
+#> mu0:      20.3
+#> sigma20:  8.47
+#> rho:      18.1, 18.1, 18, 18.1, 18.1, 18
+#> zeta:     -1.08, -1.16, -1.06, -1.06, -0.965, -1.08
 ```
 
 As we can see the method has successfully converged so we can continue. If it would not have converged increase `max_iter`. In this example we are working on a moderately sized data set, usually a thousand proteins are enough to make good estimates of the hyper-parameters, if your dataset has many proteins you can easily speed up the inference by setting for example `n_subsample=1000`.
@@ -177,6 +179,9 @@ Those posterior distribution form the basis of the subsequent steps for identify
 # Internally this function uses Stan to sample the posteriors.
 # Stan provides a lot of output which you can see by setting verbose=TRUE
 posteriors <- sample_protein_means(X, params, verbose=FALSE)
+#> Warning: There were 1 transitions after warmup that exceeded the maximum treedepth. Increase max_treedepth above 10. See
+#> http://mc-stan.org/misc/warnings.html#maximum-treedepth-exceeded
+#> Warning: Examine the pairs() plot to diagnose sampling problems
 ```
 
 Now that we have a good idea what is the latent intensity of each protein we can go on to identify the differentially detected proteins
@@ -186,37 +191,37 @@ result <- test_diff(posteriors$A,  posteriors$B)
 
 # The resulting data.frame
 head(result)
-#>                name      pval  adj_pval        diff diff_quantile_0.025
-#> protein_1 protein_1 0.6519370 0.9999930 -0.30277704          -1.6623174
-#> protein_2 protein_2 0.2023475 0.8761292 -0.55093833          -1.4280952
-#> protein_3 protein_3 0.6476790 0.9999930 -0.16726281          -0.9458469
-#> protein_4 protein_4 0.7382940 0.9999930  0.15303903          -0.7856018
-#> protein_5 protein_5 0.9150940 0.9999930 -0.04570317          -0.9518597
-#> protein_6 protein_6 0.9527940 0.9999930 -0.02652622          -1.1187081
+#>                name      pval  adj_pval         diff diff_quantile_0.025
+#> protein_1 protein_1 0.6785740 0.9999580 -0.291432032          -1.7291496
+#> protein_2 protein_2 0.1861635 0.8323397 -0.549142724          -1.3593799
+#> protein_3 protein_3 0.6433710 0.9999580 -0.172165835          -0.9487982
+#> protein_4 protein_4 0.7251470 0.9999580  0.157035095          -0.7953129
+#> protein_5 protein_5 0.9738545 0.9999580 -0.003906608          -0.8030738
+#> protein_6 protein_6 0.9511200 0.9999580 -0.033457791          -1.1671860
 #>           diff_quantile_0.975     mean
-#> protein_1           1.0567892 25.50960
-#> protein_2           0.3548970 21.33132
-#> protein_3           0.6407038 22.04862
-#> protein_4           1.1298421 26.92508
-#> protein_5           0.8541871 17.82200
-#> protein_6           1.1394976 24.30923
+#> protein_1           1.0978970 25.49918
+#> protein_2           0.3792725 21.33087
+#> protein_3           0.5618499 22.03837
+#> protein_4           1.1028073 26.92054
+#> protein_5           0.9195002 17.79907
+#> protein_6           1.0369523 24.30052
 
 # The most significant changes
 head(result[order(result$pval), ])
 #>                      name  pval     adj_pval     diff diff_quantile_0.025
-#> protein_1123 protein_1123 5e-07 2.127586e-05 3.756010            2.887895
-#> protein_1125 protein_1125 5e-07 2.127586e-05 8.684136            5.395122
-#> protein_1136 protein_1136 5e-07 2.127586e-05 6.082129            3.770749
-#> protein_1150 protein_1150 5e-07 2.127586e-05 3.726091            2.832252
-#> protein_1151 protein_1151 5e-07 2.127586e-05 8.666559            7.539040
-#> protein_1153 protein_1153 5e-07 2.127586e-05 8.524979            6.537474
+#> protein_1120 protein_1120 5e-07 2.285185e-05 2.635568            1.773760
+#> protein_1123 protein_1123 5e-07 2.285185e-05 3.740655            2.847882
+#> protein_1136 protein_1136 5e-07 2.285185e-05 6.508895            4.018305
+#> protein_1150 protein_1150 5e-07 2.285185e-05 3.752084            3.027714
+#> protein_1151 protein_1151 5e-07 2.285185e-05 8.752962            7.712919
+#> protein_1153 protein_1153 5e-07 2.285185e-05 8.657540            6.771016
 #>              diff_quantile_0.975     mean
-#> protein_1123            4.575237 21.58930
-#> protein_1125           12.403347 20.66842
-#> protein_1136            9.482807 19.31900
-#> protein_1150            4.489075 23.33110
-#> protein_1151            9.859986 21.78647
-#> protein_1153           10.244433 21.41580
+#> protein_1120            3.483684 20.99344
+#> protein_1123            4.541386 21.58175
+#> protein_1136           10.293318 19.11484
+#> protein_1150            4.504923 23.32864
+#> protein_1151            9.958242 21.75045
+#> protein_1153           10.427010 21.35123
 ```
 
 A popular way to look at such data is to make a volcano plot. Here we will use the fact that we generated the data to highlight proteins that were actually changed

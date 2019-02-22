@@ -35,8 +35,7 @@ devtools::install_github("const-ae/proDD")
 
 # Disclaimer
 
-I am still actively working on the project and although the algorithm is working fine at this point, the API  
-might still be subject to change.
+I am still actively working on the project and although the algorithm is working fine at this point, the API might still be subject to change.
 
 
 
@@ -79,6 +78,9 @@ syn_data <- generate_synthetic_data(n_rows=1234, experimental_design=experimenta
 # The data matrix, where non-observed values are coded as NA
 X <- syn_data$X
 
+# Median normalization to remove sample effects 
+X <- median_normalization(X)
+
 # The columns are the samples and each row is a protein
 head(X)
 ```
@@ -96,7 +98,7 @@ X_for_plotting <- X
 X_for_plotting[is.na(X_for_plotting)] <- 0
 pheatmap(X_for_plotting,
          main=paste0(round(sum(is.na(X))/prod(dim(X)) * 100), "% missing values"),
-         annotation_row = data.frame(changed=as.factor(syn_data$changed),
+         annotation_row = data.frame(changed=as.character(syn_data$changed),
                                      row.names = rownames(X_for_plotting)),
          show_rownames = FALSE)
 ```
