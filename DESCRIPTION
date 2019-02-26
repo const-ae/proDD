@@ -21,7 +21,15 @@ Suggests:
     ggplot2,
     viridisLite,
     knitr,
-    rmarkdown
+    rmarkdown,
+    DEP,
+    proteus,
+    MSnbase,
+    dplyr,
+    readr,
+    stringr,
+    tibble,
+    tidyr
 Imports: 
     mvtnorm,
     sn,
@@ -29,7 +37,8 @@ Imports:
     Rcpp,
     rstan (>= 2.17.3),
     rstantools (>= 1.5.1),
-    methods
+    methods,
+    SummarizedExperiment
 LinkingTo: 
     BH (>= 1.66.0-1),
     Rcpp (>= 0.12.18),
