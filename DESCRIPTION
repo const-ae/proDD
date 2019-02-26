@@ -19,7 +19,9 @@ Suggests:
     testthat,
     pheatmap,
     ggplot2,
-    viridisLite
+    viridisLite,
+    knitr,
+    rmarkdown
 Imports: 
     mvtnorm,
     sn,
@@ -37,3 +39,4 @@ LinkingTo:
 NeedsCompilation: yes
 SystemRequirements: GNU make
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr
