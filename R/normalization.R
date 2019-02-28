@@ -11,11 +11,11 @@
 #' on the assumption that a majority of the rows did not change.
 #'
 #'
-#' @param X a matrix of proteins x samples
+#' @param X a matrix of proteins and samples
 #' @return the normalized matrix
 #' @export
 median_normalization <- function(X){
-    stopifnot(is.matrix(X))
+    stopifnot(length(dim(X)) == 2)
     Xnorm <- X
     for(idx in 1:ncol(X)){
         Xnorm[, idx] <- X[, idx, drop=FALSE] -
@@ -25,4 +25,25 @@ median_normalization <- function(X){
 }
 
 
+setGeneric("median_normalization")
+
+#' @describeIn median_normalization S4 method of \code{median_normalization} for
+#'   \code{SummarizedExperiment}
+setMethod("median_normalization",
+          c(X = "SummarizedExperiment"),
+          function(X){
+              new_assay <- median_normalization(SummarizedExperiment::assay(X))
+              SummarizedExperiment::assay(X) <- new_assay
+              X
+          })
+
+#' @describeIn median_normalization S4 method of \code{median_normalization} for
+#'   \code{MSnSet}
+setMethod("median_normalization",
+          c(X = "MSnSet"),
+          function(X){
+              new_assay <- median_normalization(Biobase::exprs(X))
+              Biobase::exprs(X) <- new_assay
+              X
+          })
 
