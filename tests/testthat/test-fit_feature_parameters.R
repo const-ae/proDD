@@ -161,59 +161,6 @@ test_that("predicting features for new data works", {
 
 
 
-test_that("Support for SummarizedExperiment works", {
-    experimental_design <- rep(LETTERS[1:2], each=4)
-    data <- generate_synthetic_data(n_rows = 200, experimental_design,
-                                    rho=18, zeta=-1.2,
-                                    nu=10, eta=0.3, mu0=20, sigma20=10)
-    library(SummarizedExperiment)
-
-    sample_info <- data.frame(
-        condition = experimental_design,
-        replicate = proDD:::as_replicate(experimental_design),
-        row.names = colnames(data$X)
-    )
-    protein_info <- data.frame(
-        ID = seq_len(200),
-        changed = data$changed,
-        variance = data$sigmas2,
-        mu_a = data$mus[, "A"],
-        mu_b = data$mus[, "B"],
-        row.names = rownames(data$X)
-    )
-    se <- SummarizedExperiment(data$X, colData = sample_info, rowData = protein_info)
-    norm_se <- median_normalization(se)
-    expect_equal(assay(norm_se), median_normalization(data$X))
-
-
-
-})
-
-test_that("Support for MSnSet works", {
-    experimental_design <- rep(LETTERS[1:2], each=4)
-    data <- generate_synthetic_data(n_rows = 200, experimental_design,
-                                    rho=18, zeta=-1.2,
-                                    nu=10, eta=0.3, mu0=20, sigma20=10)
-    library(MSnbase)
-
-    sample_info_adf <- AnnotatedDataFrame(data.frame(
-        condition = experimental_design,
-        replicate = as_replicate(experimental_design),
-        row.names = colnames(data$X)
-    ))
-    protein_info_adf <- AnnotatedDataFrame(data.frame(
-        ID = seq_len(200),
-        changed = data$changed,
-        variance = data$sigmas2,
-        mu_a = data$mus[, "A"],
-        mu_b = data$mus[, "B"],
-        row.names = rownames(data$X)
-    ))
-    ms <- MSnSet(exprs = data$X, pData = sample_info_adf, fData = protein_info_adf)
-    norm_ms <- median_normalization(ms)
-    expect_equal(exprs(norm_ms), median_normalization(data$X))
-})
-
 
 
 

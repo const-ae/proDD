@@ -49,6 +49,35 @@ sample_protein_means <- function(X, params,
 }
 
 
+
+setGeneric("sample_protein_means")
+
+#' @describeIn sample_protein_means S4 method of \code{sample_protein_means} for
+#'   \code{SummarizedExperiment}
+setMethod("sample_protein_means",
+          c(X = "SummarizedExperiment"),
+          function(X, params,
+                   niter=1000, nchains=4, ncores=nchains,
+                   batch_size=1000, verbose=TRUE, ...){
+
+              sample_protein_means(SummarizedExperiment::assay(X), params, niter,
+                                   nchains, ncores, batch_size, verbose)
+          })
+
+#' @describeIn sample_protein_means S4 method of \code{sample_protein_means} for
+#'   \code{MSnSet}
+setMethod("sample_protein_means",
+          c(X = "MSnSet"),
+          function(X, params,
+                   niter=1000, nchains=4, ncores=nchains,
+                   batch_size=1000, verbose=TRUE, ...){
+              sample_protein_means(Biobase::exprs(X), params, niter,
+                                   nchains, ncores, batch_size, verbose)
+          })
+
+
+
+
 #' Internal function that does the actual work for \code{sample_protein_means}
 #'
 #' @inheritParams sample_protein_means

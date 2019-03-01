@@ -19,6 +19,9 @@
 #' @param experimental_design a vector that assignes each sample to one condition.
 #'   It has the same length as the number of columns in \code{X}. It can either be
 #'   a factor, a character or a numeric vector. Each unique element is one condition.
+#'   If \code{X} is a \code{SummarizedExperiment} or an \code{MSnSet} object,
+#'   \code{experimental_design} can also be the name of a column in the
+#'   \code{colData(X)} or \code{pData(X)}, respectively.
 #' @param dropout_curve_calc string that specifies how the dropout curves are
 #'   estimated. There are three different modes. "sample": number of curves=
 #'   number of samples, "global": number of curves=1, "global_scale": estimate
@@ -206,6 +209,61 @@ fit_parameters <- function(X, experimental_design,
     class(ret) <- "prodd_parameters"
     ret
 }
+
+
+
+setGeneric("fit_parameters")
+
+#' @describeIn fit_parameters S4 method of \code{fit_parameters} for
+#'   \code{SummarizedExperiment}
+setMethod("fit_parameters",
+          c(X = "SummarizedExperiment"),
+          function(X, experimental_design,
+                   dropout_curve_calc=c("sample", "global_scale", "global"),
+                   frac_subsample=1.0, n_subsample=round(nrow(X) * frac_subsample),
+                   max_iter=10, epsilon=1e-3, verbose=FALSE){
+
+              # First extract the experimental_design column from the colData
+              if(length(experimental_design) == 1){
+                  if(! experimental_design %in% colnames(colData(X))) {
+                      stop(paste0("'experimental_design' must reference a ",
+                                  "column in colData(X). Ie. one of: ",
+                                  paste0(colnames(colData(X)), collapse=", ")))
+                  }
+                  experimental_design <- colData(X)[, experimental_design, drop=TRUE]
+
+              }
+              params <- fit_parameters(SummarizedExperiment::assay(X), experimental_design,
+                                          dropout_curve_calc, frac_subsample, n_subsample,
+                                          max_iter, epsilon, verbose)
+              params
+          })
+
+#' @describeIn fit_parameters S4 method of \code{fit_parameters} for
+#'   \code{MSnSet}
+setMethod("fit_parameters",
+          c(X = "MSnSet"),
+          function(X, experimental_design,
+                   dropout_curve_calc=c("sample", "global_scale", "global"),
+                   frac_subsample=1.0, n_subsample=round(nrow(X) * frac_subsample),
+                   max_iter=10, epsilon=1e-3, verbose=FALSE){
+
+              # First extract the experimental_design column from the pData
+              if(length(experimental_design) == 1){
+                  if(! experimental_design %in% colnames(pData(X))) {
+                      stop(paste0("'experimental_design' must reference a ",
+                                  "column in pData(X). Ie. one of: ",
+                                  paste0(colnames(pData(X)), collapse=", ")))
+                  }
+                  experimental_design <- pData(X)[, experimental_design, drop=TRUE]
+
+              }
+              params <- fit_parameters(Biobase::exprs(X), experimental_design,
+                                          dropout_curve_calc, frac_subsample, n_subsample,
+                                          max_iter, epsilon, verbose)
+              params
+          })
+
 
 
 

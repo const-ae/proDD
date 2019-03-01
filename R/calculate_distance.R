@@ -140,6 +140,31 @@ dist_approx <- function(X, params=NULL, by_sample=TRUE, blind=TRUE,
 }
 
 
+setGeneric("dist_approx")
+
+#' @describeIn dist_approx S4 method of \code{dist_approx} for
+#'   \code{SummarizedExperiment}
+setMethod("dist_approx",
+          c(X = "SummarizedExperiment"),
+          function(X, params=NULL, by_sample=TRUE, blind=TRUE,
+                   mu_mis=NULL, var_mis=NULL){
+
+              dist_approx(SummarizedExperiment::assay(X), params, by_sample,
+                          blind, mu_mis, var_mis)
+          })
+
+#' @describeIn dist_approx S4 method of \code{dist_approx} for
+#'   \code{MSnSet}
+setMethod("dist_approx",
+          c(X = "MSnSet"),
+          function(X, params=NULL, by_sample=TRUE, blind=TRUE,
+                   mu_mis=NULL, var_mis=NULL){
+              dist_approx(Biobase::exprs(X), params, by_sample, blind,
+                          mu_mis, var_mis)
+          })
+
+
+
 
 #' Square distance between two Gaussian distributions
 #'
