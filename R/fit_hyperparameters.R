@@ -225,12 +225,12 @@ setMethod("fit_parameters",
 
               # First extract the experimental_design column from the colData
               if(length(experimental_design) == 1){
-                  if(! experimental_design %in% colnames(colData(X))) {
+                  if(! experimental_design %in% colnames(SummarizedExperiment::colData(X))) {
                       stop(paste0("'experimental_design' must reference a ",
                                   "column in colData(X). Ie. one of: ",
-                                  paste0(colnames(colData(X)), collapse=", ")))
+                                  paste0(colnames(SummarizedExperiment::colData(X)), collapse=", ")))
                   }
-                  experimental_design <- colData(X)[, experimental_design, drop=TRUE]
+                  experimental_design <- SummarizedExperiment::colData(X)[, experimental_design, drop=TRUE]
 
               }
               params <- fit_parameters(SummarizedExperiment::assay(X), experimental_design,
@@ -250,12 +250,12 @@ setMethod("fit_parameters",
 
               # First extract the experimental_design column from the pData
               if(length(experimental_design) == 1){
-                  if(! experimental_design %in% colnames(pData(X))) {
+                  if(! experimental_design %in% colnames(Biobase::pData(X))) {
                       stop(paste0("'experimental_design' must reference a ",
                                   "column in pData(X). Ie. one of: ",
-                                  paste0(colnames(pData(X)), collapse=", ")))
+                                  paste0(colnames(Biobase::pData(X)), collapse=", ")))
                   }
-                  experimental_design <- pData(X)[, experimental_design, drop=TRUE]
+                  experimental_design <- Biobase::pData(X)[, experimental_design, drop=TRUE]
 
               }
               params <- fit_parameters(Biobase::exprs(X), experimental_design,
