@@ -121,6 +121,8 @@ intensity_colnames <- colnames(full_data)[grepl("^LFQ\\.intensity\\.",
 # New data set which only contains the intensity columns
 data <- as.matrix(full_data[, intensity_colnames])
 colnames(data) <- sub("^LFQ\\.intensity\\.", "", intensity_colnames)
+data[data == 0] <- NA
+data <- log2(data)
 data[1:7, 1:6]
 rownames(data) <- full_data$Protein.IDs
 ```
@@ -240,6 +242,7 @@ Using the tidy data, I create the annotation data frame and the data matrix.
 
 ```{r}
 data <- tidy_data %>%
+    mutate(Intensity = ifelse(Intensity == 0, NA, log2(Intensity))) %>%
     select(ProteinID, SampleName, Intensity) %>%
     spread(SampleName, Intensity) %>%
     column_to_rownames("ProteinID") %>%
@@ -316,6 +319,7 @@ and create the annotation data frame.
 
 ```{r}
 data <- proteus_data$tab
+data <- log2(data)
 annotation_df <- proteus_data$metadata
 rownames(annotation_df) <- annotation_df$sample
 annotation_df$sample <- NULL
