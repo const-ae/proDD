@@ -34,11 +34,8 @@ from a normal with \code{mu} and \code{sigma2 * nobs}, but each value drops out 
 probability according to a inverse probit with its center at \code{rho} and width
 \code{zeta}:
 \deqn{
-  p(x | \mu, \sigma^2, \rho, \zeta) \propto f_{\text{Normal}}(x;\mu, \sigma^2)
-       \prod_i f_{\Phi}(x; \rho_i, \zeta_i)
-}{
-  p(x | \mu, \sigma2, \rho, \zeta) ~ Normal(x; \mu, \sigma2) Prod_i \Phi(x; \rho_i, \zeta_i)
-}
+   p(x | \mu, \sigma^2, \rho, \zeta) \propto f_{Normal}(x;\mu, \sigma^2) \prod_i f_{\Phi}(x; \rho_i, \zeta_i) }{
+   p(x | \mu, \sigma2, \rho, \zeta) ~ Normal(x; \mu, \sigma2) Prod_i \Phi(x; \rho_i, \zeta_i) }
 The distribution is related to the extended skewed normal distribution
 and formally belongs to the class of closed skewed normals.
 }
