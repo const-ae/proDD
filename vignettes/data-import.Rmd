@@ -283,9 +283,9 @@ ms
 # Proteus
 
 Proteus is an R package specifically designed for the analysis of MaxQuant
-output.
+output. But as the package is not yet on CRAN, I cannot run the code
 
-```{r}
+```{r, eval=FALSE, include=TRUE}
 library(proteus)
 ```
 
@@ -293,7 +293,7 @@ To load the data I use the `readProteinGroups()` function. It needs a vector
 of all column names that contain the intensity values, which are stored in the
 `meta` data frame.
 
-```{r}
+```{r, eval=FALSE, include=TRUE}
 meta <- data.frame(
     sample = c("LFQ.intensity.CG1407.01", "LFQ.intensity.CG1407.02",  "LFQ.intensity.CG1407.03",  "LFQ.intensity.CG4676.01",  "LFQ.intensity.CG4676.02", "LFQ.intensity.CG4676.03", "LFQ.intensity.CG51963.01", "LFQ.intensity.CG51963.02", "LFQ.intensity.CG51963.03","LFQ.intensity.CG5620A.01", "LFQ.intensity.CG5620A.02", "LFQ.intensity.CG5620A.03", "LFQ.intensity.CG5620B.01","LFQ.intensity.CG5620B.02", "LFQ.intensity.CG5620B.03", "LFQ.intensity.CG5880.01", "LFQ.intensity.CG5880.02",  "LFQ.intensity.CG5880.03",  "LFQ.intensity.CG6017.01",  "LFQ.intensity.CG6017.02", "LFQ.intensity.CG6017.03", "LFQ.intensity.CG6618.01",  "LFQ.intensity.CG6618.02",  "LFQ.intensity.CG6618.03",  "LFQ.intensity.CG6627.01", "LFQ.intensity.CG6627.02", "LFQ.intensity.CG6627.03",  "LFQ.intensity.CG8314.01", "LFQ.intensity.CG8314.02",  "LFQ.intensity.CG8314.03", "LFQ.intensity.GsbPI.001", "LFQ.intensity.GsbPI.002",  "LFQ.intensity.GsbPI.003",  "LFQ.intensity.S2R.01", "LFQ.intensity.S2R.02", "LFQ.intensity.S2R.03"),
    condition = c("CG1407", "CG1407", "CG1407", "CG4676", "CG4676", "CG4676", "CG51963", "CG51963", "CG51963", "CG5620A", "CG5620A", "CG5620A", "CG5620B", "CG5620B", "CG5620B", "CG5880", "CG5880", "CG5880", "CG6017", "CG6017", "CG6017", "CG6618", "CG6618", "CG6618", "CG6627", "CG6627", "CG6627", "CG8314", "CG8314", "CG8314", "GsbPI", "GsbPI", "GsbPI", "S2R", "S2R", "S2R" ),
@@ -317,7 +317,7 @@ proteus_data <- readProteinGroups(
 After loading the data I turn the `proteusData` object into a useable matrix
 and create the annotation data frame.
 
-```{r}
+```{r, eval=FALSE, include=TRUE}
 data <- proteus_data$tab
 data <- log2(data)
 annotation_df <- proteus_data$metadata
@@ -328,14 +328,14 @@ annotation_df$sample <- NULL
 
 Optionally, we can again turn this into a `SummarizedExperiment` or `MSnSet` object
 
-```{r}
+```{r, eval=FALSE, include=TRUE}
 library(SummarizedExperiment)
 se <- SummarizedExperiment(SimpleList(LFQ=data), colData=annotation_df)
 se
 ```
 
 
-```{r}
+```{r, eval=FALSE, include=TRUE}
 library(MSnbase)
 
 fData <- AnnotatedDataFrame(data.frame(row.names = rownames(data)))
