@@ -1,13 +1,13 @@
 Package: proDD
 Type: Package
-Title: Differentially detection of proteins in label-free mass spectrometry data
+Title: Identifying Differentially Abundant Proteins from Label-Free Mass Spectrometry Data
 Version: 0.1.0
 Authors@R: c(person("Constantin", "Ahlmann-Eltze", email = "artjom31415@googlemail.com", role = c("aut", "cre")),
              person("Simon", "Anders", email="s.anders@zmbh.uni-heidelberg.de", role="ths"))
 Description: The package implements a Bayesian model to handle label-free
     mass spectrometry data. The model takes into account the missing observations
     which occur at low intensity using a probabilistic dropout model. It can
-    be used to infer which proteins differ between conditons and provides
+    be used to infer which proteins differ between conditions and provides
     additional methods to estimate the dropout probability curves, the sample
     distances and other useful functions.
 License: GPL-3
