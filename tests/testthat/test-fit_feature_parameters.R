@@ -22,7 +22,7 @@ test_that("fit_feature_variances works", {
     # There is no perfect, but at least decent correlation
     expect_gt(cor(data$sigmas2, vars), 0.5)
     # The moderation reduces the squared error
-    simple_vars <- matrixStats::rowVars(data$X, na.rm=TRUE)
+    simple_vars <- sapply(seq_len(nrow(data$X)), function(r) var(data$X[r, ], na.rm=TRUE))
     expect_lt(sum((data$sigmas2[! is.na(simple_vars)] - vars[! is.na(simple_vars)])^2),
               sum((data$sigmas2[! is.na(simple_vars)] - simple_vars[! is.na(simple_vars)])^2))
 
