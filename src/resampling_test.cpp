@@ -2,7 +2,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-double resampling_test_impl(NumericVector x, NumericVector y, long nmax) {
+double resampling_test_impl(NumericVector x, NumericVector y, R_xlen_t nmax) {
 
     nmax = std::min(nmax, x.size() * y.size());
 
@@ -38,7 +38,8 @@ double resampling_test_impl(NumericVector x, NumericVector y, long nmax) {
 /*** R
 set.seed(1)
 x <- rnorm(100, mean=0)
-y <- sample(100, mean=2)
-resampling_test(x, y, 1000)
-mean(outer(x, y, `<`))
+y <- rnorm(100, mean=2)
+resampling_test(x, y, alternative= "less")
+mean(outer(x, y, `>`))
+t.test(x, y, alternative = "less")$p.value
 */

@@ -7,14 +7,14 @@
 using namespace Rcpp;
 
 // resampling_test_impl
-double resampling_test_impl(NumericVector x, NumericVector y, long nmax);
+double resampling_test_impl(NumericVector x, NumericVector y, R_xlen_t nmax);
 RcppExport SEXP _proDD_resampling_test_impl(SEXP xSEXP, SEXP ySEXP, SEXP nmaxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    Rcpp::traits::input_parameter< long >::type nmax(nmaxSEXP);
+    Rcpp::traits::input_parameter< R_xlen_t >::type nmax(nmaxSEXP);
     rcpp_result_gen = Rcpp::wrap(resampling_test_impl(x, y, nmax));
     return rcpp_result_gen;
 END_RCPP
