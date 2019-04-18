@@ -4,10 +4,9 @@ Title: Identifying Differentially Abundant Proteins from Label-Free Mass Spectro
 Version: 0.1.0
 Authors@R: c(person("Constantin", "Ahlmann-Eltze", email = "artjom31415@googlemail.com", role = c("aut", "cre")),
              person("Simon", "Anders", email="s.anders@zmbh.uni-heidelberg.de", role="ths"))
-Description: The package implements a Bayesian model to handle label-free
-    mass spectrometry data. The model takes into account the missing observations
-    which occur at low intensity using a probabilistic dropout model. It can
-    be used to infer which proteins differ between conditions and provides
+Description: Implements a Bayesian model to identify proteins that are differentially abundant label-free
+    mass spectrometry data. The empirical Bayesian model takes into account the missing observations
+    which occur at low intensity using a probabilistic dropout model. It provides
     additional methods to estimate the dropout probability curves, the sample
     distances and other useful functions.
 License: GPL-3
