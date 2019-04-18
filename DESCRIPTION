@@ -47,6 +47,9 @@ LinkingTo:
     rstan (>= 2.17.3),
     StanHeaders (>= 2.17.2)
 NeedsCompilation: yes
-SystemRequirements: GNU make
+SystemRequirements: 
+    GNU make,
+    netcdf,
+    libxml2
 RoxygenNote: 6.1.1
 VignetteBuilder: knitr
